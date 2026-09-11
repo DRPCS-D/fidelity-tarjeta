@@ -366,8 +366,8 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
-.records-table tbody tr:hover { background: #fbfbfc; }
-.btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+.records-table tbody tr.clickable-row { cursor: pointer; }
+.records-table tbody tr.clickable-row:hover { background: var(--brand-light); }
 
 .badge {
   display: inline-block;

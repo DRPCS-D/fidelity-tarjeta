@@ -117,6 +117,8 @@ function renderTable() {
 
   for (const r of records) {
     const tr = document.createElement("tr");
+    tr.className = "clickable-row";
+    tr.dataset.id = r.id;
     tr.innerHTML = `
       <td>${formatTimestamp(r.timestamp)}</td>
       <td>${escapeHtml(r.tit_nombre || "—")}</td>
@@ -124,9 +126,6 @@ function renderTable() {
       <td>${escapeHtml(r.tit_celular || "—")}</td>
       <td>${formatMoney(r.tit_monto_solicitado) || "—"}</td>
       <td><span class="${estadoBadgeClass(r.estado)}">${escapeHtml(r.estado || "Pendiente")}</span></td>
-      <td class="row-actions">
-        <button type="button" class="btn secondary btn-sm" data-action="detail" data-id="${escapeHtml(r.id)}">Ver</button>
-      </td>
     `;
     tbody.appendChild(tr);
   }
@@ -139,9 +138,9 @@ function escapeHtml(str) {
 }
 
 tbody.addEventListener("click", (e) => {
-  const btn = e.target.closest("button[data-action='detail']");
-  if (!btn) return;
-  openDetail(btn.dataset.id);
+  const tr = e.target.closest("tr[data-id]");
+  if (!tr) return;
+  openDetail(tr.dataset.id);
 });
 
 // ---------- Modal de detalle ----------
