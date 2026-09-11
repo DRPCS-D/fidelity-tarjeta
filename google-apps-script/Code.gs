@@ -86,6 +86,28 @@ function checkToken_(token) {
   return token === SHARED_TOKEN;
 }
 
+// Devuelve una solicitud completa (todas las columnas), para el detalle
+// del panel de gestión y la generación del PDF.
+function handleGetOne_(params) {
+  const id = params.id;
+  if (!id) {
+    return jsonResponse_({ ok: false, error: "Falta id." });
+  }
+  const sheet = getSheet_();
+  const values = sheet.getDataRange().getValues();
+  const headers = values[0];
+  const idCol = headers.indexOf("id");
+
+  for (let r = 1; r < values.length; r++) {
+    if (String(values[r][idCol]) === String(id)) {
+      const obj = {};
+      headers.forEach((h, i) => { obj[h] = formatCellForJson_(h, values[r][i]); });
+      return jsonResponse_({ ok: true, row: obj });
+    }
+  }
+  return jsonResponse_({ ok: false, error: "No se encontró la solicitud con id " + id });
+}
+
 // Si Sheets terminó guardando una fecha real (Date) en vez del texto
 // "dd/mm/aaaa" esperado, la reformatea al leerla para no romper al
 // panel de gestión ni al generador de PDF.
@@ -116,12 +138,27 @@ function doGet(e) {
     const sheet = getSheet_();
     const values = sheet.getDataRange().getValues();
     const headers = values[0];
+    const colIndex = {};
+    headers.forEach((h, i) => { colIndex[h] = i; });
+    // El listado inicial del panel solo necesita estas columnas (lo que se
+    // ve en la tabla + lo que se busca). Traer todo (85+ columnas x cientos
+    // de filas) hace que la carga inicial pese ~1MB y tarde varios segundos;
+    // el detalle completo de cada solicitud se pide aparte, al abrirla
+    // (ver acción "get").
+    const summaryCols = ["id", "timestamp", "estado", "tit_nombre", "tit_ci", "tit_celular", "tit_monto_solicitado"];
     const rows = values.slice(1).map((row) => {
       const obj = {};
-      headers.forEach((h, i) => { obj[h] = formatCellForJson_(h, row[i]); });
+      summaryCols.forEach((h) => {
+        const i = colIndex[h];
+        obj[h] = i !== undefined ? formatCellForJson_(h, row[i]) : "";
+      });
       return obj;
     });
     return jsonResponse_({ ok: true, rows: rows });
+  }
+
+  if (action === "get") {
+    return handleGetOne_(params);
   }
 
   // Acción de mantenimiento: corrige filas ya guardadas donde una fecha

@@ -369,6 +369,28 @@ body {
 .records-table tbody tr:hover { background: #fbfbfc; }
 .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
 
+.skeleton-row td {
+  text-align: center;
+  color: var(--muted);
+  padding: 26px 14px;
+  white-space: normal;
+}
+.skeleton-row td::before {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 10px;
+  vertical-align: -3px;
+  border: 2px solid var(--brand-light);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 .badge {
   display: inline-block;
   padding: 3px 10px;
