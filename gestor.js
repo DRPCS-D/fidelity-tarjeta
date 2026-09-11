@@ -5,6 +5,8 @@
 
 let allRecords = [];
 let currentFilter = "Todos";
+let currentDateFrom = null; // Date (00:00 del día elegido) o null
+let currentDateTo = null; // Date (23:59:59 del día elegido) o null
 let currentSearch = "";
 let selectedRecordId = null;
 
@@ -63,18 +65,86 @@ async function loadRecords() {
 }
 document.getElementById("btn-refresh").addEventListener("click", loadRecords);
 
-// ---------- Filtros ----------
-document.getElementById("filter-tabs").addEventListener("click", (e) => {
-  const btn = e.target.closest(".tab-btn");
-  if (!btn) return;
-  document.querySelectorAll("#filter-tabs .tab-btn").forEach((b) => b.classList.remove("active"));
-  btn.classList.add("active");
-  currentFilter = btn.dataset.estado;
-  renderTable();
+// ---------- Filtros (panel desplegable) ----------
+const filtersDropdown = document.getElementById("filters-dropdown");
+const filtersToggle = document.getElementById("filters-toggle");
+const filtersPanel = document.getElementById("filters-panel");
+const filtersBadge = document.getElementById("filters-badge");
+const filterDateFromInput = document.getElementById("filter-date-from");
+const filterDateToInput = document.getElementById("filter-date-to");
+
+function toggleFiltersPanel(show) {
+  const next = show !== undefined ? show : filtersPanel.hidden;
+  filtersPanel.hidden = !next;
+}
+filtersToggle.addEventListener("click", () => toggleFiltersPanel());
+document.addEventListener("click", (e) => {
+  if (!filtersDropdown.contains(e.target)) toggleFiltersPanel(false);
 });
+
+function updateFiltersBadge() {
+  let count = 0;
+  if (currentFilter !== "Todos") count++;
+  if (currentDateFrom) count++;
+  if (currentDateTo) count++;
+  filtersBadge.hidden = count === 0;
+  filtersBadge.textContent = String(count);
+  filtersToggle.classList.toggle("filters-toggle-active", count > 0);
+}
+
+function applyFiltersFromPanel() {
+  const checked = document.querySelector('input[name="estado-filter"]:checked');
+  currentFilter = checked ? checked.value : "Todos";
+
+  const fromVal = filterDateFromInput.value;
+  const toVal = filterDateToInput.value;
+  currentDateFrom = fromVal ? new Date(fromVal + "T00:00:00") : null;
+  currentDateTo = toVal ? new Date(toVal + "T23:59:59") : null;
+
+  updateFiltersBadge();
+  renderTable();
+  toggleFiltersPanel(false);
+}
+document.getElementById("filters-apply").addEventListener("click", applyFiltersFromPanel);
+
+document.getElementById("filters-clear").addEventListener("click", () => {
+  document.querySelector('input[name="estado-filter"][value="Todos"]').checked = true;
+  filterDateFromInput.value = "";
+  filterDateToInput.value = "";
+  currentFilter = "Todos";
+  currentDateFrom = null;
+  currentDateTo = null;
+  updateFiltersBadge();
+  renderTable();
+  toggleFiltersPanel(false);
+});
+
 document.getElementById("search-input").addEventListener("input", (e) => {
   currentSearch = e.target.value.trim().toLowerCase();
   renderTable();
+});
+
+// ---------- Exportar a Excel ----------
+document.getElementById("btn-export").addEventListener("click", () => {
+  const records = getFilteredRecords();
+  if (!records.length) {
+    alert("No hay solicitudes para exportar con los filtros actuales.");
+    return;
+  }
+  const rows = records.map((r) => ({
+    "Fecha": formatTimestamp(r.timestamp),
+    "Titular": r.tit_nombre || "",
+    "C.I.": r.tit_ci || "",
+    "Celular": r.tit_celular || "",
+    "Monto Solicitado": r.tit_monto_solicitado ? formatMoney(r.tit_monto_solicitado) : "",
+    "Estado": r.estado || "Pendiente",
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws["!cols"] = [{ wch: 18 }, { wch: 28 }, { wch: 12 }, { wch: 14 }, { wch: 16 }, { wch: 12 }];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Solicitudes");
+  const fecha = new Date().toISOString().slice(0, 10);
+  XLSX.writeFile(wb, `fidelity_solicitudes_${fecha}.xlsx`);
 });
 
 function formatMoney(v) {
@@ -111,6 +181,12 @@ const emptyMsg = document.getElementById("empty-msg");
 function getFilteredRecords() {
   return allRecords.filter((r) => {
     if (currentFilter !== "Todos" && r.estado !== currentFilter) return false;
+    if (currentDateFrom || currentDateTo) {
+      const d = new Date(r.timestamp);
+      if (isNaN(d.getTime())) return false;
+      if (currentDateFrom && d < currentDateFrom) return false;
+      if (currentDateTo && d > currentDateTo) return false;
+    }
     if (currentSearch) {
       const haystack = `${r.tit_nombre || ""} ${r.tit_ci || ""}`.toLowerCase();
       if (!haystack.includes(currentSearch)) return false;

@@ -30,13 +30,36 @@
 
 <main id="gestor-content" class="gestor-content" hidden>
   <div class="gestor-toolbar">
-    <div class="filter-tabs" id="filter-tabs">
-      <button class="tab-btn active" data-estado="Todos">Todos</button>
-      <button class="tab-btn" data-estado="Pendiente">Pendientes</button>
-      <button class="tab-btn" data-estado="Aprobado">Aprobados</button>
-      <button class="tab-btn" data-estado="Rechazado">Rechazados</button>
+    <div class="filters-dropdown" id="filters-dropdown">
+      <button type="button" id="filters-toggle" class="btn secondary">
+        Filtros<span id="filters-badge" class="filters-badge" hidden></span>
+      </button>
+      <div class="filters-panel" id="filters-panel" hidden>
+        <div class="filters-group">
+          <span class="filters-label">Estado</span>
+          <div class="filters-radio-list">
+            <label><input type="radio" name="estado-filter" value="Todos" checked> Todos</label>
+            <label><input type="radio" name="estado-filter" value="Pendiente"> Pendientes</label>
+            <label><input type="radio" name="estado-filter" value="Aprobado"> Aprobados</label>
+            <label><input type="radio" name="estado-filter" value="Rechazado"> Rechazados</label>
+          </div>
+        </div>
+        <div class="filters-group">
+          <label class="filters-label" for="filter-date-from">Fecha desde</label>
+          <input type="date" id="filter-date-from">
+        </div>
+        <div class="filters-group">
+          <label class="filters-label" for="filter-date-to">Fecha hasta</label>
+          <input type="date" id="filter-date-to">
+        </div>
+        <div class="filters-actions">
+          <button type="button" id="filters-clear" class="btn secondary btn-sm">Limpiar</button>
+          <button type="button" id="filters-apply" class="btn primary btn-sm">Aplicar</button>
+        </div>
+      </div>
     </div>
     <input type="search" id="search-input" placeholder="Buscar por nombre o C.I...." class="search-input">
+    <button type="button" id="btn-export" class="btn secondary">Exportar a Excel</button>
     <button type="button" id="btn-refresh" class="btn secondary">Actualizar</button>
   </div>
 
@@ -82,6 +105,7 @@
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="config.js"></script>
 <script src="manifest.js"></script>
 <script src="fields.js"></script>
