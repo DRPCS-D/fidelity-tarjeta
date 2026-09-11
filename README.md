@@ -66,7 +66,19 @@ Los espacios de **firma**, **aclaración** y **Nº de C.I.** de la Declaración 
 - `app.js` — lógica del formulario: tabs, autocálculo de totales y envío del registro a Google Sheets.
 - `gestor.js` — lógica del panel de gestión: login simple, listado, filtros, cambio de estado y descarga de PDF.
 - `assets/fidelity-template.pdf` — copia del PDF original, usada como plantilla de fondo (no se modifica el texto legal, solo se agregan capas de texto encima).
+- `assets/logo-color.png`, `assets/logo-white.png`, `assets/favicon.ico` — logo e ícono oficiales de Fidelity Group, extraídos del manual de marca.
 - `google-apps-script/Code.gs` — script que se pega en Google Apps Script; expone la planilla como una API simple (crear solicitud, listar, cambiar estado).
+
+## Identidad de marca
+
+Los colores, la tipografía y el logo siguen el manual de marca de Fidelity Group:
+
+- **Azul Francia 2** `#2B4193` (RGB 43-65-147) — color primario (header, botones, títulos de sección).
+- **Gris 30%** `#C6C6C5` (RGB 198-198-197) — color secundario (líneas divisorias, detalles).
+- Tipografía: `Helvetica Neue` (con `Helvetica`/`Arial` como respaldo, ya que Helvetica Neue no está disponible como fuente web).
+- El motivo de red de nodos del manual se usa como decoración sutil en el header de ambas páginas.
+
+Las variables de color están centralizadas en `styles.css` (`:root`), así que para ajustar la paleta alcanza con cambiar `--brand`, `--brand-dark`, `--brand-light` y `--brand-gray` ahí.
 
 ## Privacidad
 
