@@ -86,6 +86,19 @@ function checkToken_(token) {
   return token === SHARED_TOKEN;
 }
 
+// Busca en qué fila de la hoja está un id, leyendo SOLO la columna "id"
+// (mucho más rápido que traer toda la hoja para buscar una fila).
+// Devuelve el número de fila real (1-indexed) o -1 si no se encontró.
+function findRowById_(sheet, id) {
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return -1;
+  const ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  for (let i = 0; i < ids.length; i++) {
+    if (String(ids[i][0]) === String(id)) return i + 2;
+  }
+  return -1;
+}
+
 // Devuelve una solicitud completa (todas las columnas), para el detalle
 // del panel de gestión y la generación del PDF.
 function handleGetOne_(params) {
@@ -94,18 +107,16 @@ function handleGetOne_(params) {
     return jsonResponse_({ ok: false, error: "Falta id." });
   }
   const sheet = getSheet_();
-  const values = sheet.getDataRange().getValues();
-  const headers = values[0];
-  const idCol = headers.indexOf("id");
-
-  for (let r = 1; r < values.length; r++) {
-    if (String(values[r][idCol]) === String(id)) {
-      const obj = {};
-      headers.forEach((h, i) => { obj[h] = formatCellForJson_(h, values[r][i]); });
-      return jsonResponse_({ ok: true, row: obj });
-    }
+  const row = findRowById_(sheet, id);
+  if (row === -1) {
+    return jsonResponse_({ ok: false, error: "No se encontró la solicitud con id " + id });
   }
-  return jsonResponse_({ ok: false, error: "No se encontró la solicitud con id " + id });
+  const lastCol = sheet.getLastColumn();
+  const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  const values = sheet.getRange(row, 1, 1, lastCol).getValues()[0];
+  const obj = {};
+  headers.forEach((h, i) => { obj[h] = formatCellForJson_(h, values[i]); });
+  return jsonResponse_({ ok: true, row: obj });
 }
 
 // Si Sheets terminó guardando una fecha real (Date) en vez del texto
@@ -136,24 +147,36 @@ function doGet(e) {
 
   if (action === "list") {
     const sheet = getSheet_();
-    const values = sheet.getDataRange().getValues();
-    const headers = values[0];
+    const lastRow = sheet.getLastRow();
+    const lastCol = sheet.getLastColumn();
+    const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
     const colIndex = {};
     headers.forEach((h, i) => { colIndex[h] = i; });
     // El listado inicial del panel solo necesita estas columnas (lo que se
     // ve en la tabla + lo que se busca). Traer todo (85+ columnas x cientos
     // de filas) hace que la carga inicial pese ~1MB y tarde varios segundos;
     // el detalle completo de cada solicitud se pide aparte, al abrirla
-    // (ver acción "get").
+    // (ver acción "get"). Además se lee solo hasta la última columna que
+    // hace falta (en vez de toda la hoja), para que el propio getValues()
+    // sea más rápido del lado de Sheets.
     const summaryCols = ["id", "timestamp", "estado", "tit_nombre", "tit_ci", "tit_celular", "tit_monto_solicitado"];
-    const rows = values.slice(1).map((row) => {
-      const obj = {};
-      summaryCols.forEach((h) => {
-        const i = colIndex[h];
-        obj[h] = i !== undefined ? formatCellForJson_(h, row[i]) : "";
+    const maxIndex = summaryCols.reduce((max, c) => {
+      const i = colIndex[c];
+      return (i !== undefined && i > max) ? i : max;
+    }, 0);
+    const numDataRows = lastRow - 1;
+    const rows = [];
+    if (numDataRows > 0) {
+      const values = sheet.getRange(2, 1, numDataRows, maxIndex + 1).getValues();
+      values.forEach((row) => {
+        const obj = {};
+        summaryCols.forEach((h) => {
+          const i = colIndex[h];
+          obj[h] = i !== undefined ? formatCellForJson_(h, row[i]) : "";
+        });
+        rows.push(obj);
       });
-      return obj;
-    });
+    }
     return jsonResponse_({ ok: true, rows: rows });
   }
 
@@ -238,18 +261,13 @@ function handleUpdateStatus_(body) {
   }
 
   const sheet = getSheet_();
-  const values = sheet.getDataRange().getValues();
-  const headers = values[0];
-  const idCol = headers.indexOf("id");
-  const estadoCol = headers.indexOf("estado");
-
-  for (let r = 1; r < values.length; r++) {
-    if (String(values[r][idCol]) === String(id)) {
-      sheet.getRange(r + 1, estadoCol + 1).setValue(estado);
-      return jsonResponse_({ ok: true });
-    }
+  const row = findRowById_(sheet, id);
+  if (row === -1) {
+    return jsonResponse_({ ok: false, error: "No se encontró la solicitud con id " + id });
   }
-  return jsonResponse_({ ok: false, error: "No se encontró la solicitud con id " + id });
+  const estadoCol = ALL_COLUMNS.indexOf("estado") + 1;
+  sheet.getRange(row, estadoCol).setValue(estado);
+  return jsonResponse_({ ok: true });
 }
 
 // Importación masiva: recibe muchas filas en un solo POST y las escribe
