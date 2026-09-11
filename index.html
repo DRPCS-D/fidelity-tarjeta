@@ -11,7 +11,7 @@
   <img src="assets/logo.svg" alt="" class="app-logo" onerror="this.style.display='none'">
   <div>
     <h1>Formulario Único de Identificación de Cliente</h1>
-    <p class="subtitle">Fidelity Card — completá los datos, enviá el registro y descargá el PDF con el mismo formato del original</p>
+    <p class="subtitle">Fidelity Card — completá los datos y enviá el registro a la planilla</p>
   </div>
 </header>
 
@@ -390,21 +390,17 @@
 
   <div class="actions">
     <button type="button" id="btn-reset" class="btn secondary">Limpiar formulario</button>
-    <button type="button" id="btn-send" class="btn secondary">Enviar registro a la planilla</button>
-    <button type="button" id="btn-generate" class="btn primary">Descargar PDF completado</button>
+    <button type="button" id="btn-send" class="btn primary">Enviar registro a la planilla</button>
   </div>
-  <p id="status-msg" class="status-msg" role="status"></p>
   <p id="send-msg" class="status-msg" role="status"></p>
 </form>
 
 <footer class="app-footer">
-  <p>El PDF se genera localmente en tu navegador. Al enviar el registro, los datos se guardan en la planilla de Google Sheets configurada.</p>
+  <p>Al enviar el registro, los datos se guardan en la planilla de Google Sheets configurada. El PDF se descarga desde el Panel de gestión.</p>
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="config.js"></script>
 <script src="manifest.js"></script>
-<script src="fields.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

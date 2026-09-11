@@ -67,6 +67,8 @@
     </div>
     <div id="detail-body" class="modal-body"></div>
     <div class="modal-footer">
+      <button type="button" id="detail-download" class="btn secondary">Descargar PDF</button>
+      <span class="modal-footer-spacer"></span>
       <button type="button" id="detail-reject" class="btn danger">Rechazar</button>
       <button type="button" id="detail-approve" class="btn success">Aprobar</button>
     </div>
@@ -77,8 +79,11 @@
   <p>Los datos provienen de la planilla de Google Sheets configurada en config.js.</p>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="config.js"></script>
 <script src="manifest.js"></script>
+<script src="fields.js"></script>
+<script src="pdfgen.js"></script>
 <script src="gestor.js"></script>
 </body>
 </html>

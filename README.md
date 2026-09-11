@@ -1,6 +1,6 @@
 # Formulario Fidelity Card
 
-App web (sin backend propio) para completar el **Formulario Único de Identificación de Cliente y Manifestación de Bienes** de Fidelity Card, descargar un PDF con el **mismo formato exacto** del original, enviar cada solicitud a una **planilla de Google Sheets** y gestionarlas (Aprobar / Rechazar) desde un **panel de gestión**.
+App web (sin backend propio) para completar el **Formulario Único de Identificación de Cliente y Manifestación de Bienes** de Fidelity Card, enviar cada solicitud a una **planilla de Google Sheets**, y desde un **panel de gestión** revisarlas, marcarlas como **Aprobado** / **Rechazado** y descargar el PDF con el **mismo formato exacto** del original.
 
 ## Cómo usarla
 
@@ -11,8 +11,9 @@ App web (sin backend propio) para completar el **Formulario Único de Identifica
    - En producción: desplegado en Vercel (sitio estático, sin configuración especial).
 2. Completá los datos en las distintas pestañas (Datos del Titular, Domicilio y Laboral, Ingresos/Egresos, Referencias, Cónyuge/Adicional, Registro de Firmas, Datos de Tarjeta, Seguro Crediticio).
 3. **"Enviar registro a la planilla"** guarda los datos en la planilla de Google Sheets (queda con estado "Pendiente").
-4. **"Descargar PDF completado"** genera y descarga un PDF idéntico al formulario original, con los campos llenados y las opciones (Sexo, Estado Civil, Vivienda, Tipo de empleo) marcadas con una X. Es independiente del envío a la planilla — podés hacer una, la otra, o ambas cosas.
-5. Desde **"Panel de gestión"** (`gestor.html`) se ven todas las solicitudes enviadas y se pueden marcar como **Aprobado** o **Rechazado**.
+4. Entrá a `gestor.html` (Panel de gestión), abrí el detalle de la solicitud y desde ahí:
+   - **"Descargar PDF"** genera y descarga un PDF idéntico al formulario original, con los campos llenados y las opciones (Sexo, Estado Civil, Vivienda, Tipo de empleo) marcadas con una X — usando los datos ya guardados en la planilla.
+   - **"Aprobar"** / **"Rechazar"** cambian el estado de la solicitud.
 
 ## Conectar con Google Sheets (una sola vez)
 
@@ -43,7 +44,7 @@ Cada vez que agregues un campo nuevo al formulario, agregalo también en `manife
 
 - Pide una contraseña simple (configurada en `GESTOR_PASSWORD` dentro de `config.js`) antes de mostrar las solicitudes.
 - Lista todas las solicitudes con filtros por estado (Todos / Pendientes / Aprobados / Rechazados) y buscador por nombre o C.I.
-- Al abrir el detalle de una solicitud se pueden ver todos los campos cargados, y marcarla como **Aprobado** o **Rechazado** con un clic.
+- Al abrir el detalle de una solicitud se pueden ver todos los campos cargados, descargar el PDF completado, y marcarla como **Aprobado** o **Rechazado** con un clic.
 
 ### ⚠️ Sobre la seguridad de `API_TOKEN` y `GESTOR_PASSWORD`
 
@@ -56,16 +57,17 @@ Los espacios de **firma**, **aclaración** y **Nº de C.I.** de la Declaración 
 ## Estructura
 
 - `index.html` — formulario.
-- `gestor.html` — panel de gestión de solicitudes.
+- `gestor.html` — panel de gestión de solicitudes (listado, detalle, Aprobar/Rechazar, descarga de PDF).
 - `styles.css` — estilos de ambas páginas.
 - `config.js` — URL del Web App de Google Sheets, token compartido y contraseña del panel de gestión.
 - `manifest.js` — lista maestra de campos del formulario (nombres, etiquetas legibles y agrupación), usada para enviar datos a la planilla y para mostrarlos en el panel de gestión.
-- `fields.js` — coordenadas exactas (medidas sobre el PDF original) de cada campo/checkbox en cada página, usadas solo para generar el PDF.
-- `app.js` — lógica del formulario: generación del PDF con [pdf-lib](https://pdf-lib.js.org/) (cargado desde CDN) y envío del registro a Google Sheets.
-- `gestor.js` — lógica del panel de gestión: login simple, listado, filtros y cambio de estado.
+- `fields.js` — coordenadas exactas (medidas sobre el PDF original) de cada campo/checkbox en cada página, usadas para generar el PDF.
+- `pdfgen.js` — genera el PDF con [pdf-lib](https://pdf-lib.js.org/) (cargado desde CDN) a partir de los datos de una solicitud ya guardada; lo usa `gestor.js`.
+- `app.js` — lógica del formulario: tabs, autocálculo de totales y envío del registro a Google Sheets.
+- `gestor.js` — lógica del panel de gestión: login simple, listado, filtros, cambio de estado y descarga de PDF.
 - `assets/fidelity-template.pdf` — copia del PDF original, usada como plantilla de fondo (no se modifica el texto legal, solo se agregan capas de texto encima).
 - `google-apps-script/Code.gs` — script que se pega en Google Apps Script; expone la planilla como una API simple (crear solicitud, listar, cambiar estado).
 
 ## Privacidad
 
-El PDF se genera 100% en el navegador. Los datos del formulario solo se envían a la planilla de Google Sheets cuando hacés clic en "Enviar registro a la planilla" — nunca a ningún otro servidor.
+El PDF se genera 100% en el navegador (a partir de los datos guardados en la planilla). Los datos del formulario solo se envían a la planilla de Google Sheets cuando hacés clic en "Enviar registro a la planilla" — nunca a ningún otro servidor.

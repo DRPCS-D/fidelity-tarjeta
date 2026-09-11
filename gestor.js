@@ -177,6 +177,25 @@ modal.addEventListener("click", (e) => { if (e.target === modal) modal.hidden = 
 document.getElementById("detail-approve").addEventListener("click", () => updateStatus("Aprobado"));
 document.getElementById("detail-reject").addEventListener("click", () => updateStatus("Rechazado"));
 
+document.getElementById("detail-download").addEventListener("click", async () => {
+  const record = allRecords.find((r) => String(r.id) === String(selectedRecordId));
+  if (!record) return;
+  const btn = document.getElementById("detail-download");
+  btn.disabled = true;
+  const originalLabel = btn.textContent;
+  btn.textContent = "Generando…";
+  try {
+    const pdfBytes = await generateFidelityPdf(record);
+    downloadBlob(pdfBytes, buildFidelityFileName(record));
+  } catch (err) {
+    console.error(err);
+    alert("No se pudo generar el PDF: " + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+  }
+});
+
 async function updateStatus(estado) {
   if (!selectedRecordId) return;
   const approveBtn = document.getElementById("detail-approve");

@@ -169,6 +169,3 @@ const CHECKBOX_GROUPS = {
   },
 };
 
-// Fechas de página 4 que se escriben como texto libre "dd/mm/aaaa"
-// (en el PDF original no hay huecos separados por "/").
-const FREE_DATE_FIELDS = ["seg_emision", "seg_vigencia_desde", "seg_vigencia_hasta"];
