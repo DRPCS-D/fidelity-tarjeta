@@ -40,6 +40,25 @@ El envío de datos y el panel de gestión funcionan contra una planilla de Googl
 
 Cada vez que agregues un campo nuevo al formulario, agregalo también en `manifest.js` (columna `ALL_FIELD_NAMES`) **y** en `FIELD_NAMES` dentro de `google-apps-script/Code.gs`, siempre al final de la lista para no correr las columnas ya existentes en la planilla.
 
+### Actualizar el script cuando ya está instalado
+
+Pegar una versión nueva de `Code.gs` y guardar **no alcanza** para que la URL `.../exec` ya publicada use el código nuevo (los Web Apps de Apps Script quedan "congelados" en la versión que estaba deployada). Para actualizarla sin cambiar la URL:
+
+1. En el editor de Apps Script: **Implementar > Administrar implementaciones**.
+2. Click en el ícono de lápiz (editar) de la implementación existente.
+3. En **Versión**, elegí **Nueva versión**.
+4. **Implementar**.
+
+### Corregir fechas guardadas mal (una sola vez)
+
+Google Sheets puede convertir automáticamente el texto `"dd/mm/aaaa"` en una fecha real de la hoja al guardarlo, lo que rompe tanto el panel de gestión como la descarga del PDF para esas solicitudes. La versión actual de `Code.gs` ya lo evita para los envíos nuevos. Si tenías solicitudes guardadas **antes** de este fix, corretilas una sola vez visitando en el navegador (reemplazando la URL y el token):
+
+```
+https://script.google.com/macros/s/TU_ID/exec?action=repairDates&token=TU_TOKEN
+```
+
+Va a responder algo como `{"ok":true,"fixed":2}` indicando cuántas celdas corrigió.
+
 ## Panel de gestión (`gestor.html`)
 
 - Pide una contraseña simple (configurada en `GESTOR_PASSWORD` dentro de `config.js`) antes de mostrar las solicitudes.

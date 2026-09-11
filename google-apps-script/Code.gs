@@ -13,6 +13,12 @@
  *    - Quién tiene acceso: Cualquier usuario.
  * 6. Copiá la URL que te da (".../exec") y pegala en SHEETS_API_URL
  *    dentro de config.js.
+ *
+ * CÓMO ACTUALIZAR (si ya tenías esto instalado y pegás una versión nueva):
+ * Guardar el archivo NO alcanza para que la URL ".../exec" ya publicada
+ * use el código nuevo. Hay que ir a Implementar > Administrar implementaciones,
+ * editar (ícono de lápiz) la implementación existente, en "Versión" elegir
+ * "Nueva versión" e Implementar. Así la URL no cambia.
  */
 
 const SHEET_NAME = "Solicitudes";
@@ -50,6 +56,14 @@ const FIELD_NAMES = [
 const FIXED_COLUMNS = ["id", "timestamp", "estado"];
 const ALL_COLUMNS = FIXED_COLUMNS.concat(FIELD_NAMES);
 
+// Columnas que llegan como texto "dd/mm/aaaa". Sheets las auto-convierte a
+// un valor de fecha real si se escriben sin más, lo que rompe tanto la
+// vista del panel como la generación del PDF (que espera ese texto tal
+// cual). Por eso se fuerza el formato de celda a texto ("@") antes de
+// escribir, y se re-formatean defensivamente al leer por si ya quedaron
+// guardadas como fecha (filas viejas, o edición manual en la planilla).
+const DATE_COLUMNS = ["tit_fecha_solicitud", "tit_fecha_nac", "con_fecha_nac", "seg_emision", "seg_vigencia_desde", "seg_vigencia_hasta"];
+
 function getSheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName(SHEET_NAME);
@@ -72,6 +86,21 @@ function checkToken_(token) {
   return token === SHARED_TOKEN;
 }
 
+// Si Sheets terminó guardando una fecha real (Date) en vez del texto
+// "dd/mm/aaaa" esperado, la reformatea al leerla para no romper al
+// panel de gestión ni al generador de PDF.
+function formatCellForJson_(colName, value) {
+  if (Object.prototype.toString.call(value) === "[object Date]") {
+    if (DATE_COLUMNS.indexOf(colName) !== -1) {
+      return Utilities.formatDate(value, Session.getScriptTimeZone(), "dd/MM/yyyy");
+    }
+    if (colName === "timestamp") {
+      return value.toISOString();
+    }
+  }
+  return value;
+}
+
 function doGet(e) {
   const params = (e && e.parameter) || {};
   if (!checkToken_(params.token)) {
@@ -89,10 +118,17 @@ function doGet(e) {
     const headers = values[0];
     const rows = values.slice(1).map((row) => {
       const obj = {};
-      headers.forEach((h, i) => { obj[h] = row[i]; });
+      headers.forEach((h, i) => { obj[h] = formatCellForJson_(h, row[i]); });
       return obj;
     });
     return jsonResponse_({ ok: true, rows: rows });
+  }
+
+  // Acción de mantenimiento: corrige filas ya guardadas donde una fecha
+  // quedó como valor de fecha real en vez de texto "dd/mm/aaaa".
+  // Se puede llamar una sola vez después de actualizar este script.
+  if (action === "repairDates") {
+    return handleRepairDates_();
   }
 
   return jsonResponse_({ ok: false, error: "Acción desconocida: " + action });
@@ -135,7 +171,19 @@ function handleCreate_(body) {
     return data[col] !== undefined ? data[col] : "";
   });
 
-  sheet.appendRow(row);
+  const rowIndex = sheet.getLastRow() + 1;
+
+  // Forzar formato de texto en las columnas de fecha ANTES de escribir el
+  // valor, para que Sheets no las convierta automáticamente en un valor
+  // de fecha real (eso rompería el "dd/mm/aaaa" que espera el PDF).
+  DATE_COLUMNS.forEach((colName) => {
+    const colIndex = ALL_COLUMNS.indexOf(colName);
+    if (colIndex !== -1) {
+      sheet.getRange(rowIndex, colIndex + 1).setNumberFormat("@");
+    }
+  });
+
+  sheet.getRange(rowIndex, 1, 1, row.length).setValues([row]);
   return jsonResponse_({ ok: true, id: id, timestamp: timestamp });
 }
 
@@ -162,4 +210,33 @@ function handleUpdateStatus_(body) {
     }
   }
   return jsonResponse_({ ok: false, error: "No se encontró la solicitud con id " + id });
+}
+
+function handleRepairDates_() {
+  const sheet = getSheet_();
+  const values = sheet.getDataRange().getValues();
+  const headers = values[0];
+  const tz = Session.getScriptTimeZone();
+  let fixed = 0;
+
+  DATE_COLUMNS.forEach((colName) => {
+    const colIndex = headers.indexOf(colName);
+    if (colIndex === -1) return;
+    const numRows = values.length - 1;
+    if (numRows <= 0) return;
+
+    // Deja toda la columna en formato texto para que no vuelva a pasar.
+    sheet.getRange(2, colIndex + 1, numRows, 1).setNumberFormat("@");
+
+    for (let r = 1; r < values.length; r++) {
+      const cell = values[r][colIndex];
+      if (Object.prototype.toString.call(cell) === "[object Date]") {
+        const formatted = Utilities.formatDate(cell, tz, "dd/MM/yyyy");
+        sheet.getRange(r + 1, colIndex + 1).setValue(formatted);
+        fixed++;
+      }
+    }
+  });
+
+  return jsonResponse_({ ok: true, fixed: fixed });
 }
