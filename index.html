@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formulario Fidelity Card</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="app-header">
+  <img src="assets/logo.svg" alt="" class="app-logo" onerror="this.style.display='none'">
+  <div>
+    <h1>Formulario Único de Identificación de Cliente</h1>
+    <p class="subtitle">Fidelity Card — completá los datos y descargá el PDF con el mismo formato del original</p>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button class="tab-btn active" data-tab="titular">Datos del Titular</button>
+  <button class="tab-btn" data-tab="domicilio">Domicilio y Laboral</button>
+  <button class="tab-btn" data-tab="finanzas">Ingresos / Egresos</button>
+  <button class="tab-btn" data-tab="referencias">Referencias</button>
+  <button class="tab-btn" data-tab="conyuge">Cónyuge / Adicional</button>
+  <button class="tab-btn" data-tab="firmas">Registro de Firmas</button>
+  <button class="tab-btn" data-tab="tarjeta">Datos de Tarjeta</button>
+  <button class="tab-btn" data-tab="seguro">Seguro Crediticio</button>
+</nav>
+
+<form id="fidelity-form">
+
+  <!-- ============ TITULAR ============ -->
+  <section class="tab-panel active" data-panel="titular">
+    <h2>Datos del Titular</h2>
+    <div class="grid">
+      <label class="col-8">Nombres y Apellidos
+        <input type="text" name="tit_nombre" autocomplete="off">
+      </label>
+      <label class="col-4">Fecha de la solicitud
+        <input type="date" name="tit_fecha_solicitud">
+      </label>
+
+      <label class="col-6">Número Doc. Identidad
+        <input type="text" name="tit_ci" inputmode="numeric">
+      </label>
+      <label class="col-3">Monto Solicitado
+        <input type="text" name="tit_monto_solicitado" inputmode="numeric" placeholder="Gs.">
+      </label>
+      <label class="col-3">Monto Concedido
+        <input type="text" name="tit_monto_concedido" inputmode="numeric" placeholder="Gs.">
+      </label>
+
+      <label class="col-4">Nacionalidad
+        <input type="text" name="tit_nacionalidad">
+      </label>
+      <div class="col-4 field-radio">
+        <span class="field-label">Sexo</span>
+        <div class="radio-row">
+          <label><input type="radio" name="tit_sexo" value="M"> M</label>
+          <label><input type="radio" name="tit_sexo" value="F"> F</label>
+        </div>
+      </div>
+      <label class="col-4">Fecha de Nacimiento
+        <input type="date" name="tit_fecha_nac">
+      </label>
+
+      <div class="col-6 field-radio">
+        <span class="field-label">Vivienda</span>
+        <div class="radio-row">
+          <label><input type="radio" name="tit_vivienda" value="Propia"> Propia</label>
+          <label><input type="radio" name="tit_vivienda" value="Alquilada"> Alquilada</label>
+          <label><input type="radio" name="tit_vivienda" value="Otra"> Otra</label>
+        </div>
+        <input type="text" name="tit_vivienda_otra" placeholder="Especificar..." class="conditional-input" data-show-when="tit_vivienda=Otra">
+      </div>
+      <div class="col-6 field-radio">
+        <span class="field-label">Estado Civil</span>
+        <div class="radio-row wrap">
+          <label><input type="radio" name="tit_estado_civil" value="Soltero"> Soltero/a</label>
+          <label><input type="radio" name="tit_estado_civil" value="Casado"> Casado/a</label>
+          <label><input type="radio" name="tit_estado_civil" value="Divorciado"> Divorciado/a</label>
+          <label><input type="radio" name="tit_estado_civil" value="Viudo"> Viudo/a</label>
+        </div>
+      </div>
+
+      <label class="col-6">Número de Celular
+        <input type="text" name="tit_celular" inputmode="tel">
+      </label>
+      <label class="col-6">Correo Electrónico
+        <input type="email" name="tit_email">
+      </label>
+
+      <label class="col-4">Sucursal
+        <input type="text" name="meta_sucursal">
+      </label>
+      <label class="col-4">Sección
+        <input type="text" name="meta_seccion">
+      </label>
+      <label class="col-4">Captador
+        <input type="text" name="meta_captador">
+      </label>
+    </div>
+  </section>
+
+  <!-- ============ DOMICILIO / LABORAL ============ -->
+  <section class="tab-panel" data-panel="domicilio">
+    <h2>Domicilio Particular</h2>
+    <div class="grid">
+      <label class="col-6">Dirección
+        <input type="text" name="dom_direccion">
+      </label>
+      <label class="col-3">Barrio
+        <input type="text" name="dom_barrio">
+      </label>
+      <label class="col-3">Ciudad
+        <input type="text" name="dom_ciudad">
+      </label>
+      <label class="col-12">Obs.
+        <input type="text" name="dom_obs">
+      </label>
+    </div>
+
+    <h2>Datos Laborales</h2>
+    <div class="grid">
+      <label class="col-7">Empresa
+        <input type="text" name="lab_empresa">
+      </label>
+      <label class="col-5">Número de Celular
+        <input type="text" name="lab_celular" inputmode="tel">
+      </label>
+      <label class="col-12">Dirección Laboral
+        <input type="text" name="lab_direccion">
+      </label>
+
+      <div class="col-12 field-radio">
+        <span class="field-label">Tipo de empleo</span>
+        <div class="radio-row wrap">
+          <label><input type="radio" name="lab_tipo_empleo" value="Empleado"> Empleado/a</label>
+          <label><input type="radio" name="lab_tipo_empleo" value="Independiente"> Independiente</label>
+          <label><input type="radio" name="lab_tipo_empleo" value="Comerciante"> Comerciante</label>
+          <label><input type="radio" name="lab_tipo_empleo" value="Jubilado"> Jubilado/a</label>
+          <label><input type="radio" name="lab_tipo_empleo" value="Otro"> Otro</label>
+        </div>
+        <input type="text" name="lab_tipo_empleo_otro" placeholder="Especificar..." class="conditional-input" data-show-when="lab_tipo_empleo=Otro">
+      </div>
+
+      <label class="col-4">Cargo
+        <input type="text" name="lab_cargo">
+      </label>
+      <label class="col-4">Monto de Ingreso
+        <input type="text" name="lab_monto_ingreso" inputmode="numeric" placeholder="Gs.">
+      </label>
+      <label class="col-4">Antigüedad
+        <input type="text" name="lab_antiguedad">
+      </label>
+    </div>
+  </section>
+
+  <!-- ============ INGRESOS / EGRESOS ============ -->
+  <section class="tab-panel" data-panel="finanzas">
+    <h2>Ingresos y Egresos (expresados en guaraníes)</h2>
+    <div class="grid two-col-money">
+      <div class="money-col">
+        <label>Sueldo
+          <input type="text" name="ing_sueldo" class="money" inputmode="numeric" placeholder="Gs.">
+        </label>
+        <label>Sueldo Cónyuge
+          <input type="text" name="ing_sueldo_conyuge" class="money" inputmode="numeric" placeholder="Gs.">
+        </label>
+        <label>Jubilación
+          <input type="text" name="ing_jubilacion" class="money" inputmode="numeric" placeholder="Gs.">
+        </label>
+        <label>Otros ingresos
+          <input type="text" name="ing_otros" class="money" inputmode="numeric" placeholder="Gs.">
+        </label>
+        <label class="total"><strong>TOTAL INGRESOS</strong>
+          <input type="text" name="ing_total" readonly>
+        </label>
+      </div>
+      <div class="money-col">
+        <label>Gastos familiares
+          <input type="text" name="egr_gastos_familiares" class="money" inputmode="numeric" placeholder="Gs.">
+        </label>
+        <label>Cuota de préstamos
+          <input type="text" name="egr_cuota_prestamos" class="money" inputmode="numeric" placeholder="Gs.">
+        </label>
+        <label>Alquiler pagado
+          <input type="text" name="egr_alquiler" class="money" inputmode="numeric" placeholder="Gs.">
+        </label>
+        <label>Otros egresos (especificar)
+          <input type="text" name="egr_otros" class="money" inputmode="numeric" placeholder="Gs.">
+        </label>
+        <label class="total"><strong>TOTAL EGRESOS</strong>
+          <input type="text" name="egr_total" readonly>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ REFERENCIAS ============ -->
+  <section class="tab-panel" data-panel="referencias">
+    <h2>Referencias Comerciales (Otros)</h2>
+    <div class="grid">
+      <label class="col-7">Entidad
+        <input type="text" name="refcom1_entidad">
+      </label>
+      <label class="col-5">Teléfono
+        <input type="text" name="refcom1_telefono" inputmode="tel">
+      </label>
+      <label class="col-7">Entidad
+        <input type="text" name="refcom2_entidad">
+      </label>
+      <label class="col-5">Teléfono
+        <input type="text" name="refcom2_telefono" inputmode="tel">
+      </label>
+    </div>
+
+    <h2>Referencias Personales (Pariente o Amigo)</h2>
+    <div class="grid">
+      <label class="col-5">Nombres y Apellidos
+        <input type="text" name="refper1_nombre">
+      </label>
+      <label class="col-4">Número de Celular
+        <input type="text" name="refper1_celular" inputmode="tel">
+      </label>
+      <label class="col-3">Vínculo
+        <input type="text" name="refper1_vinculo">
+      </label>
+      <label class="col-5">Nombres y Apellidos
+        <input type="text" name="refper2_nombre">
+      </label>
+      <label class="col-4">Número de Celular
+        <input type="text" name="refper2_celular" inputmode="tel">
+      </label>
+      <label class="col-3">Vínculo
+        <input type="text" name="refper2_vinculo">
+      </label>
+    </div>
+  </section>
+
+  <!-- ============ CÓNYUGE / ADICIONAL ============ -->
+  <section class="tab-panel" data-panel="conyuge">
+    <h2>Datos Personales del: Cónyuge / Adicional</h2>
+    <div class="grid">
+      <label class="col-12">Nombres y Apellidos
+        <input type="text" name="con_nombre">
+      </label>
+      <label class="col-4">Nacionalidad
+        <input type="text" name="con_nacionalidad">
+      </label>
+      <label class="col-4">Número Doc. Identidad
+        <input type="text" name="con_ci" inputmode="numeric">
+      </label>
+      <div class="col-4 field-radio">
+        <span class="field-label">Sexo</span>
+        <div class="radio-row">
+          <label><input type="radio" name="con_sexo" value="M"> M</label>
+          <label><input type="radio" name="con_sexo" value="F"> F</label>
+        </div>
+      </div>
+      <label class="col-4">Fecha de Nacimiento
+        <input type="date" name="con_fecha_nac">
+      </label>
+    </div>
+
+    <h2>Datos Laborales; Cónyuge / Adicional</h2>
+    <div class="grid">
+      <label class="col-7">Empresa
+        <input type="text" name="conlab_empresa">
+      </label>
+      <label class="col-5">Número de Celular
+        <input type="text" name="conlab_celular" inputmode="tel">
+      </label>
+      <label class="col-12">Dirección Laboral
+        <input type="text" name="conlab_direccion">
+      </label>
+
+      <div class="col-12 field-radio">
+        <span class="field-label">Tipo de empleo</span>
+        <div class="radio-row wrap">
+          <label><input type="radio" name="conlab_tipo_empleo" value="Empleado"> Empleado/a</label>
+          <label><input type="radio" name="conlab_tipo_empleo" value="Independiente"> Independiente</label>
+          <label><input type="radio" name="conlab_tipo_empleo" value="Comerciante"> Comerciante</label>
+          <label><input type="radio" name="conlab_tipo_empleo" value="Jubilado"> Jubilado/a</label>
+          <label><input type="radio" name="conlab_tipo_empleo" value="Otro"> Otro</label>
+        </div>
+        <input type="text" name="conlab_tipo_empleo_otro" placeholder="Especificar..." class="conditional-input" data-show-when="conlab_tipo_empleo=Otro">
+      </div>
+
+      <label class="col-4">Cargo
+        <input type="text" name="conlab_cargo">
+      </label>
+      <label class="col-4">Monto de Ingreso
+        <input type="text" name="conlab_monto_ingreso" inputmode="numeric" placeholder="Gs.">
+      </label>
+      <label class="col-4">Antigüedad
+        <input type="text" name="conlab_antiguedad">
+      </label>
+    </div>
+  </section>
+
+  <!-- ============ REGISTRO DE FIRMAS ============ -->
+  <section class="tab-panel" data-panel="firmas">
+    <h2>Formulario de Registro de Firmas</h2>
+    <p class="hint">Los espacios de firma, aclaración y Nº de C.I. de la Declaración Jurada quedan en blanco en el PDF para completarse a mano.</p>
+    <div class="grid">
+      <label class="col-6">Nombres
+        <input type="text" name="firma_nombres">
+      </label>
+      <label class="col-6">Apellidos
+        <input type="text" name="firma_apellidos">
+      </label>
+    </div>
+  </section>
+
+  <!-- ============ TARJETA ============ -->
+  <section class="tab-panel" data-panel="tarjeta">
+    <h2>Condiciones Generales — Datos de la Tarjeta</h2>
+    <p class="hint">El texto de las condiciones generales no se modifica. Los espacios de firma quedan en blanco.</p>
+    <div class="grid">
+      <label class="col-6">Nro. de Tarjeta
+        <input type="text" name="card_numero">
+      </label>
+      <label class="col-6">Línea de Crédito Gs.
+        <input type="text" name="card_linea_credito" inputmode="numeric">
+      </label>
+      <label class="col-6">Costo de Emisión (anual)
+        <input type="text" name="card_costo_emision">
+      </label>
+      <label class="col-6">Costo de Cuota anual/Renovación (anual)
+        <input type="text" name="card_costo_cuota_anual">
+      </label>
+      <label class="col-6">Costo de Renovación (p/evento)
+        <input type="text" name="card_costo_renovacion">
+      </label>
+      <label class="col-6">Interés compensatorio (% anual)
+        <input type="text" name="card_interes_compensatorio">
+      </label>
+      <label class="col-6">Interés Moratorio (% anual)
+        <input type="text" name="card_interes_moratorio">
+      </label>
+      <label class="col-6">Interés Punitorio (% anual)
+        <input type="text" name="card_interes_punitorio">
+      </label>
+      <label class="col-12">Gestión de Recupero de Crédito en Mora
+        <input type="text" name="card_gestion_recupero">
+      </label>
+    </div>
+  </section>
+
+  <!-- ============ SEGURO ============ -->
+  <section class="tab-panel" data-panel="seguro">
+    <h2>Contrato de Seguro Crediticio — Cancelación de Deudas</h2>
+    <p class="hint">El cliente y la cédula de identidad al pie quedan en blanco para la firma manuscrita.</p>
+    <div class="grid">
+      <label class="col-4">Sucursal
+        <input type="text" name="seg_sucursal">
+      </label>
+      <label class="col-4">Póliza / Endorso N°
+        <input type="text" name="seg_poliza">
+      </label>
+      <label class="col-6">Asegurado
+        <input type="text" name="seg_asegurado">
+      </label>
+      <label class="col-6">Documento
+        <input type="text" name="seg_documento" inputmode="numeric">
+      </label>
+      <label class="col-7">Domicilio
+        <input type="text" name="seg_domicilio">
+      </label>
+      <label class="col-5">Localidad
+        <input type="text" name="seg_localidad">
+      </label>
+      <label class="col-4">Emisión
+        <input type="date" name="seg_emision">
+      </label>
+      <label class="col-4">Vigencia desde (12:00hs. del)
+        <input type="date" name="seg_vigencia_desde">
+      </label>
+      <label class="col-4">Vigencia hasta (12:00hs. del)
+        <input type="date" name="seg_vigencia_hasta">
+      </label>
+      <label class="col-4">Plazo
+        <input type="text" name="seg_plazo">
+      </label>
+      <label class="col-8">Capital Asegurado de la Presente Póliza
+        <input type="text" name="seg_capital" inputmode="numeric">
+      </label>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button type="button" id="btn-reset" class="btn secondary">Limpiar formulario</button>
+    <button type="button" id="btn-generate" class="btn primary">Descargar PDF completado</button>
+  </div>
+  <p id="status-msg" class="status-msg" role="status"></p>
+</form>
+
+<footer class="app-footer">
+  <p>Los datos se procesan localmente en tu navegador — no se envían a ningún servidor.</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="fields.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
