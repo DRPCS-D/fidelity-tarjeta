@@ -78,10 +78,25 @@ document.getElementById("search-input").addEventListener("input", (e) => {
 });
 
 function formatMoney(v) {
-  if (!v) return "";
-  const n = parseFloat(String(v).replace(/[^\d.-]/g, ""));
-  return isNaN(n) ? v : n.toLocaleString("es-PY");
+  if (v === null || v === undefined || v === "") return "";
+  // Se descartan puntos/espacios/"Gs." etc. y se vuelve a formatear, para
+  // que sea idempotente aunque el valor ya venga con separador de miles
+  // (p. ej. los totales de ingresos/egresos, que ya llegan formateados).
+  const digits = String(v).replace(/\D/g, "");
+  if (!digits) return String(v);
+  const n = parseInt(digits, 10);
+  return isNaN(n) ? String(v) : n.toLocaleString("es-PY");
 }
+
+// Campos monetarios (Gs.) que se muestran con punto de miles en el
+// detalle de la solicitud.
+const MONEY_FIELDS = new Set([
+  "tit_monto_solicitado", "tit_monto_concedido", "lab_monto_ingreso",
+  "ing_sueldo", "ing_sueldo_conyuge", "ing_jubilacion", "ing_otros", "ing_total",
+  "egr_gastos_familiares", "egr_cuota_prestamos", "egr_alquiler", "egr_otros", "egr_total",
+  "conlab_monto_ingreso", "card_linea_credito", "card_costo_emision",
+  "card_costo_cuota_anual", "card_costo_renovacion", "seg_capital",
+]);
 function formatTimestamp(iso) {
   if (!iso) return "";
   const d = new Date(iso);
@@ -158,7 +173,10 @@ function openDetail(id) {
   for (const group of FIELD_GROUPS) {
     const rowsHtml = group.fields
       .filter((f) => record[f] !== undefined && record[f] !== "")
-      .map((f) => `<div class="detail-row"><span class="detail-label">${FIELD_LABELS[f] || f}</span><span class="detail-value">${escapeHtml(record[f])}</span></div>`)
+      .map((f) => {
+        const value = MONEY_FIELDS.has(f) ? formatMoney(record[f]) : record[f];
+        return `<div class="detail-row"><span class="detail-label">${FIELD_LABELS[f] || f}</span><span class="detail-value">${escapeHtml(value)}</span></div>`;
+      })
       .join("");
     if (!rowsHtml) continue;
     html += `<div class="detail-group"><h3>${group.title}</h3>${rowsHtml}</div>`;
