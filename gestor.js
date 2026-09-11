@@ -33,9 +33,6 @@ function tryLogin() {
     document.getElementById("gate-error").textContent = "Contraseña incorrecta.";
   }
 }
-if (checkStoredAccess()) {
-  grantAccess();
-}
 
 // ---------- Carga de datos ----------
 const listStatus = document.getElementById("list-status");
@@ -220,4 +217,11 @@ async function updateStatus(estado) {
     approveBtn.disabled = false;
     rejectBtn.disabled = false;
   }
+}
+
+// Se hace al final del archivo (y no arriba, cerca del resto del login)
+// para que todas las funciones/variables ya estén definidas antes de
+// disparar la carga automática cuando la sesión ya estaba iniciada.
+if (checkStoredAccess()) {
+  grantAccess();
 }
