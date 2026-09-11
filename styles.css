@@ -12,6 +12,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 body {
   margin: 0;
@@ -32,6 +33,13 @@ body {
 .app-logo { height: 40px; }
 .app-header h1 { margin: 0 0 4px; font-size: 1.35rem; }
 .app-header .subtitle { margin: 0; font-size: 0.9rem; color: #d7d7d7; }
+.app-header .header-link {
+  margin-left: auto;
+  white-space: nowrap;
+  text-decoration: none;
+  padding: 9px 16px;
+  font-size: 0.85rem;
+}
 
 .tabs {
   display: flex;
@@ -262,4 +270,165 @@ body {
   color: var(--muted);
   font-size: 0.78rem;
   margin-top: 30px;
+}
+
+/* ============ Panel de gestión ============ */
+.gate-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  padding: 20px;
+}
+.gate-box {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 30px;
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+}
+.gate-box h2 { margin: 0 0 8px; color: var(--brand-dark); }
+.gate-box input[type="password"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin: 14px 0;
+  font-size: 0.95rem;
+}
+.gate-box .btn { width: 100%; }
+
+.gestor-content {
+  max-width: 1100px;
+  margin: 20px auto 0;
+  padding: 0 20px;
+}
+.gestor-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.filter-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.88rem;
+}
+
+.table-wrap {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+.records-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+.records-table th, .records-table td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.records-table th {
+  background: #f4f5f7;
+  color: var(--brand-dark);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.records-table tbody tr:hover { background: #fbfbfc; }
+.btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.badge-pending { background: #fbf1cf; color: #7a5c00; }
+.badge-approved { background: #d9f2df; color: #176a34; }
+.badge-rejected { background: #fbdada; color: #8a1f1f; }
+
+.btn.success { background: #2f9e52; color: #fff; }
+.btn.success:hover { opacity: 0.9; }
+.btn.danger { background: #c0392b; color: #fff; }
+.btn.danger:hover { opacity: 0.9; }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 20, 20, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  overflow-y: auto;
+  z-index: 100;
+}
+.modal-box {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  max-width: 720px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-header h2 { margin: 0; font-size: 1.05rem; color: var(--brand-dark); }
+.modal-body {
+  padding: 18px 22px;
+  overflow-y: auto;
+}
+.detail-estado { margin-bottom: 16px; font-size: 0.9rem; }
+.detail-group { margin-bottom: 18px; }
+.detail-group h3 {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+  margin: 0 0 10px;
+}
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+  font-size: 0.88rem;
+}
+.detail-label { color: var(--muted); }
+.detail-value { font-weight: 600; text-align: right; }
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 16px 22px;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 640px) {
+  .app-header { flex-wrap: wrap; }
+  .app-header .header-link { margin-left: 0; }
+  .records-table { font-size: 0.8rem; }
+  .detail-row { flex-direction: column; gap: 2px; }
+  .detail-value { text-align: left; }
 }

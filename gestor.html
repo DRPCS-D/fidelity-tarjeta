@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Gestión — Fidelity Card</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="app-header">
+  <div>
+    <h1>Panel de Gestión de Solicitudes</h1>
+    <p class="subtitle">Fidelity Card — registros enviados desde el formulario</p>
+  </div>
+  <a href="index.html" class="btn secondary header-link">Ir al formulario</a>
+</header>
+
+<div id="gate" class="gate-screen">
+  <div class="gate-box">
+    <h2>Acceso al panel</h2>
+    <p class="hint">Ingresá la contraseña del equipo para ver las solicitudes.</p>
+    <input type="password" id="gate-password" placeholder="Contraseña">
+    <button type="button" id="gate-submit" class="btn primary">Entrar</button>
+    <p id="gate-error" class="status-msg error"></p>
+  </div>
+</div>
+
+<main id="gestor-content" class="gestor-content" hidden>
+  <div class="gestor-toolbar">
+    <div class="filter-tabs" id="filter-tabs">
+      <button class="tab-btn active" data-estado="Todos">Todos</button>
+      <button class="tab-btn" data-estado="Pendiente">Pendientes</button>
+      <button class="tab-btn" data-estado="Aprobado">Aprobados</button>
+      <button class="tab-btn" data-estado="Rechazado">Rechazados</button>
+    </div>
+    <input type="search" id="search-input" placeholder="Buscar por nombre o C.I...." class="search-input">
+    <button type="button" id="btn-refresh" class="btn secondary">Actualizar</button>
+  </div>
+
+  <p id="list-status" class="status-msg"></p>
+
+  <div class="table-wrap">
+    <table class="records-table" id="records-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Titular</th>
+          <th>C.I.</th>
+          <th>Celular</th>
+          <th>Monto Solicitado</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="records-tbody"></tbody>
+    </table>
+    <p id="empty-msg" class="hint" hidden>No hay solicitudes para mostrar.</p>
+  </div>
+</main>
+
+<!-- Modal de detalle -->
+<div id="detail-modal" class="modal-overlay" hidden>
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="detail-title">Detalle de la solicitud</h2>
+      <button type="button" id="detail-close" class="btn secondary">Cerrar</button>
+    </div>
+    <div id="detail-body" class="modal-body"></div>
+    <div class="modal-footer">
+      <button type="button" id="detail-reject" class="btn danger">Rechazar</button>
+      <button type="button" id="detail-approve" class="btn success">Aprobar</button>
+    </div>
+  </div>
+</div>
+
+<footer class="app-footer">
+  <p>Los datos provienen de la planilla de Google Sheets configurada en config.js.</p>
+</footer>
+
+<script src="config.js"></script>
+<script src="manifest.js"></script>
+<script src="gestor.js"></script>
+</body>
+</html>
