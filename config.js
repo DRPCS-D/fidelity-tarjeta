@@ -6,7 +6,7 @@
 
 // URL del Web App de Apps Script, algo como:
 // https://script.google.com/macros/s/AKfycb.../exec
-const SHEETS_API_URL = "";
+const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbwFAZEE7mszkyx2dS3dnNQOldpUnVNo7jz-nRDkC0kqgMem7gsnYBC1DvrYvb1tfWj3/exec";
 
 // Token compartido simple para evitar que cualquiera con la URL
 // pueda escribir en la planilla. No es seguridad fuerte (cualquiera
