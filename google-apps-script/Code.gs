@@ -154,6 +154,9 @@ function doPost(e) {
   if (action === "updateStatus") {
     return handleUpdateStatus_(body);
   }
+  if (action === "bulkImport") {
+    return handleBulkImport_(body);
+  }
   return jsonResponse_({ ok: false, error: "Acción desconocida: " + action });
 }
 
@@ -210,6 +213,41 @@ function handleUpdateStatus_(body) {
     }
   }
   return jsonResponse_({ ok: false, error: "No se encontró la solicitud con id " + id });
+}
+
+// Importación masiva: recibe muchas filas en un solo POST y las escribe
+// de una sola vez (mucho más rápido y confiable que llamar "create" una
+// por una). body.rows = [{ id, timestamp, estado, data: {...} }, ...]
+function handleBulkImport_(body) {
+  const items = body.rows || [];
+  if (!items.length) {
+    return jsonResponse_({ ok: false, error: "No se recibieron filas para importar." });
+  }
+
+  const sheet = getSheet_();
+  const startRow = sheet.getLastRow() + 1;
+
+  const matrix = items.map((item) => {
+    const data = item.data || {};
+    return ALL_COLUMNS.map((col) => {
+      if (col === "id") return item.id || Utilities.getUuid();
+      if (col === "timestamp") return item.timestamp || new Date().toISOString();
+      if (col === "estado") return item.estado || "Pendiente";
+      return data[col] !== undefined && data[col] !== null ? data[col] : "";
+    });
+  });
+
+  // Igual que en handleCreate_: forzar texto en las columnas de fecha
+  // ANTES de escribir, para que Sheets no las convierta en fechas reales.
+  DATE_COLUMNS.forEach((colName) => {
+    const colIndex = ALL_COLUMNS.indexOf(colName);
+    if (colIndex !== -1) {
+      sheet.getRange(startRow, colIndex + 1, matrix.length, 1).setNumberFormat("@");
+    }
+  });
+
+  sheet.getRange(startRow, 1, matrix.length, ALL_COLUMNS.length).setValues(matrix);
+  return jsonResponse_({ ok: true, imported: matrix.length });
 }
 
 function handleRepairDates_() {
