@@ -70,7 +70,26 @@
     </button>
   </div>
 
-  <p id="list-status" class="status-msg"></p>
+  <div class="kpi-row" id="kpi-row">
+    <div class="kpi-card">
+      <span class="kpi-value" id="kpi-mostrando">0</span>
+      <span class="kpi-label">Mostrando</span>
+    </div>
+    <div class="kpi-card kpi-pending">
+      <span class="kpi-value" id="kpi-pendientes">0</span>
+      <span class="kpi-label">Pendientes</span>
+    </div>
+    <div class="kpi-card kpi-approved">
+      <span class="kpi-value" id="kpi-aprobados">0</span>
+      <span class="kpi-label">Aprobados</span>
+    </div>
+    <div class="kpi-card kpi-rejected">
+      <span class="kpi-value" id="kpi-rechazados">0</span>
+      <span class="kpi-label">Rechazados</span>
+    </div>
+  </div>
+
+  <p id="list-status" class="status-msg" hidden></p>
 
   <div id="loading-overlay" class="loading-overlay" hidden>
     <div class="spinner"></div>

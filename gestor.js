@@ -42,6 +42,7 @@ const loadingOverlay = document.getElementById("loading-overlay");
 function setListStatus(msg, type) {
   listStatus.textContent = msg;
   listStatus.className = "status-msg" + (type ? " " + type : "");
+  listStatus.hidden = !msg;
 }
 
 async function loadRecords() {
@@ -208,9 +209,7 @@ function renderTable() {
   const records = getFilteredRecords();
   tbody.innerHTML = "";
   emptyMsg.hidden = records.length > 0;
-
-  const total = allRecords.length;
-  setListStatus(records.length === total ? `${total}` : `${records.length} de ${total}`, "ok");
+  updateKpis(records);
 
   for (const r of records) {
     const tr = document.createElement("tr");
@@ -226,6 +225,26 @@ function renderTable() {
     `;
     tbody.appendChild(tr);
   }
+}
+
+const kpiMostrando = document.getElementById("kpi-mostrando");
+const kpiPendientes = document.getElementById("kpi-pendientes");
+const kpiAprobados = document.getElementById("kpi-aprobados");
+const kpiRechazados = document.getElementById("kpi-rechazados");
+
+// "Mostrando" refleja los filtros aplicados; los conteos por estado son
+// siempre sobre el total de solicitudes, para que sirvan como KPI general.
+function updateKpis(filteredRecords) {
+  kpiMostrando.textContent = filteredRecords.length;
+  let pendientes = 0, aprobados = 0, rechazados = 0;
+  for (const r of allRecords) {
+    if (r.estado === "Aprobado") aprobados++;
+    else if (r.estado === "Rechazado") rechazados++;
+    else pendientes++;
+  }
+  kpiPendientes.textContent = pendientes;
+  kpiAprobados.textContent = aprobados;
+  kpiRechazados.textContent = rechazados;
 }
 
 function escapeHtml(str) {

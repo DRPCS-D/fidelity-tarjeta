@@ -513,6 +513,30 @@ body {
 }
 .btn-sm { padding: 7px 14px; font-size: 0.82rem; }
 
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.kpi-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.kpi-value { font-size: 1.5rem; font-weight: 700; color: var(--brand-dark); }
+.kpi-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.02em; }
+.kpi-card.kpi-pending .kpi-value { color: #7a5c00; }
+.kpi-card.kpi-approved .kpi-value { color: #176a34; }
+.kpi-card.kpi-rejected .kpi-value { color: #8a1f1f; }
+@media (max-width: 640px) {
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+}
+
 .table-wrap {
   background: var(--card-bg);
   border: 1px solid var(--border);
