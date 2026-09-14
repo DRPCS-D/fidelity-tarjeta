@@ -322,6 +322,38 @@ body {
 .status-msg.error { color: var(--danger); }
 .status-msg.ok { color: #1a7a3c; }
 
+.success-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  padding: 20px;
+}
+.success-box {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 40px 36px;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+}
+.success-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  background: #d9f2df;
+  color: #1a7a3c;
+  font-size: 2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.success-box h2 { margin: 0 0 10px; color: var(--brand-dark); }
+.success-box p { margin: 0; color: var(--muted); font-size: 0.92rem; line-height: 1.5; }
+
 .app-footer {
   text-align: center;
   color: var(--muted);

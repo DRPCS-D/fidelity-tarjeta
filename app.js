@@ -188,11 +188,17 @@ btnSend.addEventListener("click", async () => {
   setSendMsg("Enviando registro…", "");
   try {
     await sendRecord();
-    setSendMsg("Registro enviado correctamente a la planilla. Podés descargar el PDF desde el Panel de gestión.", "ok");
+    showSuccessScreen();
   } catch (err) {
     console.error(err);
     setSendMsg("Ocurrió un error al enviar el registro: " + err.message, "error");
-  } finally {
     updateSendEnabled();
   }
 });
+
+function showSuccessScreen() {
+  document.getElementById("tabs").hidden = true;
+  form.hidden = true;
+  document.getElementById("success-screen").hidden = false;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
