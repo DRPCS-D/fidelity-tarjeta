@@ -58,7 +58,6 @@ async function loadRecords() {
     if (!json.ok) throw new Error(json.error || "Error desconocido.");
     allRecords = json.rows || [];
     allRecords.sort((a, b) => String(b.timestamp).localeCompare(String(a.timestamp)));
-    setListStatus(`${allRecords.length} solicitud(es) cargada(s).`, "ok");
     renderTable();
   } catch (err) {
     console.error(err);
@@ -209,6 +208,9 @@ function renderTable() {
   const records = getFilteredRecords();
   tbody.innerHTML = "";
   emptyMsg.hidden = records.length > 0;
+
+  const total = allRecords.length;
+  setListStatus(records.length === total ? `${total}` : `${records.length} de ${total}`, "ok");
 
   for (const r of records) {
     const tr = document.createElement("tr");
