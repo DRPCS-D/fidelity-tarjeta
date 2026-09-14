@@ -182,6 +182,7 @@ body {
 }
 
 .field-label { font-size: 0.82rem; }
+.required-mark { color: var(--danger); margin-left: 2px; }
 .radio-row {
   display: flex;
   gap: 14px;

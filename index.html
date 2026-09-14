@@ -33,52 +33,52 @@
   <section class="tab-panel active" data-panel="titular">
     <h2>Datos del Titular</h2>
     <div class="grid">
-      <label class="col-12">Nombres y Apellidos
-        <input type="text" name="tit_nombre" autocomplete="off">
+      <label class="col-12"><span>Nombres y Apellidos<span class="required-mark">*</span></span>
+        <input type="text" name="tit_nombre" autocomplete="off" required>
       </label>
 
-      <label class="col-6">Número Doc. Identidad
-        <input type="text" name="tit_ci" inputmode="numeric">
+      <label class="col-6"><span>Número Doc. Identidad<span class="required-mark">*</span></span>
+        <input type="text" name="tit_ci" inputmode="numeric" required>
       </label>
-      <label class="col-6">Monto Solicitado
-        <input type="text" name="tit_monto_solicitado" inputmode="numeric" placeholder="Gs.">
+      <label class="col-6"><span>Monto Solicitado<span class="required-mark">*</span></span>
+        <input type="text" name="tit_monto_solicitado" inputmode="numeric" placeholder="Gs." required>
       </label>
 
-      <label class="col-4">Nacionalidad
-        <input type="text" name="tit_nacionalidad">
+      <label class="col-4"><span>Nacionalidad<span class="required-mark">*</span></span>
+        <input type="text" name="tit_nacionalidad" required>
       </label>
       <div class="col-4 field-radio">
-        <span class="field-label">Sexo</span>
+        <span class="field-label">Sexo<span class="required-mark">*</span></span>
         <div class="radio-row">
-          <label><input type="radio" name="tit_sexo" value="M"> M</label>
-          <label><input type="radio" name="tit_sexo" value="F"> F</label>
+          <label><input type="radio" name="tit_sexo" value="M" required> M</label>
+          <label><input type="radio" name="tit_sexo" value="F" required> F</label>
         </div>
       </div>
-      <label class="col-4">Fecha de Nacimiento
-        <input type="date" name="tit_fecha_nac">
+      <label class="col-4"><span>Fecha de Nacimiento<span class="required-mark">*</span></span>
+        <input type="date" name="tit_fecha_nac" required>
       </label>
 
       <div class="col-6 field-radio">
-        <span class="field-label">Vivienda</span>
+        <span class="field-label">Vivienda<span class="required-mark">*</span></span>
         <div class="radio-row">
-          <label><input type="radio" name="tit_vivienda" value="Propia"> Propia</label>
-          <label><input type="radio" name="tit_vivienda" value="Alquilada"> Alquilada</label>
-          <label><input type="radio" name="tit_vivienda" value="Otra"> Otra</label>
+          <label><input type="radio" name="tit_vivienda" value="Propia" required> Propia</label>
+          <label><input type="radio" name="tit_vivienda" value="Alquilada" required> Alquilada</label>
+          <label><input type="radio" name="tit_vivienda" value="Otra" required> Otra</label>
         </div>
         <input type="text" name="tit_vivienda_otra" placeholder="Especificar..." class="conditional-input" data-show-when="tit_vivienda=Otra">
       </div>
       <div class="col-6 field-radio">
-        <span class="field-label">Estado Civil</span>
+        <span class="field-label">Estado Civil<span class="required-mark">*</span></span>
         <div class="radio-row wrap">
-          <label><input type="radio" name="tit_estado_civil" value="Soltero"> Soltero/a</label>
-          <label><input type="radio" name="tit_estado_civil" value="Casado"> Casado/a</label>
-          <label><input type="radio" name="tit_estado_civil" value="Divorciado"> Divorciado/a</label>
-          <label><input type="radio" name="tit_estado_civil" value="Viudo"> Viudo/a</label>
+          <label><input type="radio" name="tit_estado_civil" value="Soltero" required> Soltero/a</label>
+          <label><input type="radio" name="tit_estado_civil" value="Casado" required> Casado/a</label>
+          <label><input type="radio" name="tit_estado_civil" value="Divorciado" required> Divorciado/a</label>
+          <label><input type="radio" name="tit_estado_civil" value="Viudo" required> Viudo/a</label>
         </div>
       </div>
 
-      <label class="col-6">Número de Celular
-        <input type="text" name="tit_celular" inputmode="tel">
+      <label class="col-6"><span>Número de Celular<span class="required-mark">*</span></span>
+        <input type="text" name="tit_celular" inputmode="tel" required>
       </label>
       <label class="col-6">Correo Electrónico
         <input type="email" name="tit_email">
@@ -100,14 +100,14 @@
   <section class="tab-panel" data-panel="domicilio">
     <h2>Domicilio Particular</h2>
     <div class="grid">
-      <label class="col-6">Dirección
-        <input type="text" name="dom_direccion">
+      <label class="col-6"><span>Dirección<span class="required-mark">*</span></span>
+        <input type="text" name="dom_direccion" required>
       </label>
-      <label class="col-3">Barrio
-        <input type="text" name="dom_barrio">
+      <label class="col-3"><span>Barrio<span class="required-mark">*</span></span>
+        <input type="text" name="dom_barrio" required>
       </label>
-      <label class="col-3">Ciudad
-        <input type="text" name="dom_ciudad">
+      <label class="col-3"><span>Ciudad<span class="required-mark">*</span></span>
+        <input type="text" name="dom_ciudad" required>
       </label>
       <label class="col-12">Obs.
         <input type="text" name="dom_obs">
@@ -116,8 +116,8 @@
 
     <h2>Datos Laborales</h2>
     <div class="grid">
-      <label class="col-7">Empresa
-        <input type="text" name="lab_empresa">
+      <label class="col-7"><span>Empresa<span class="required-mark">*</span></span>
+        <input type="text" name="lab_empresa" required>
       </label>
       <label class="col-5">Número de Celular
         <input type="text" name="lab_celular" inputmode="tel">
@@ -127,25 +127,25 @@
       </label>
 
       <div class="col-12 field-radio">
-        <span class="field-label">Tipo de empleo</span>
+        <span class="field-label">Tipo de empleo<span class="required-mark">*</span></span>
         <div class="radio-row wrap">
-          <label><input type="radio" name="lab_tipo_empleo" value="Empleado"> Empleado/a</label>
-          <label><input type="radio" name="lab_tipo_empleo" value="Independiente"> Independiente</label>
-          <label><input type="radio" name="lab_tipo_empleo" value="Comerciante"> Comerciante</label>
-          <label><input type="radio" name="lab_tipo_empleo" value="Jubilado"> Jubilado/a</label>
-          <label><input type="radio" name="lab_tipo_empleo" value="Otro"> Otro</label>
+          <label><input type="radio" name="lab_tipo_empleo" value="Empleado" required> Empleado/a</label>
+          <label><input type="radio" name="lab_tipo_empleo" value="Independiente" required> Independiente</label>
+          <label><input type="radio" name="lab_tipo_empleo" value="Comerciante" required> Comerciante</label>
+          <label><input type="radio" name="lab_tipo_empleo" value="Jubilado" required> Jubilado/a</label>
+          <label><input type="radio" name="lab_tipo_empleo" value="Otro" required> Otro</label>
         </div>
         <input type="text" name="lab_tipo_empleo_otro" placeholder="Especificar..." class="conditional-input" data-show-when="lab_tipo_empleo=Otro">
       </div>
 
-      <label class="col-4">Cargo
-        <input type="text" name="lab_cargo">
+      <label class="col-4"><span>Cargo<span class="required-mark">*</span></span>
+        <input type="text" name="lab_cargo" required>
       </label>
-      <label class="col-4">Monto de Ingreso
-        <input type="text" name="lab_monto_ingreso" inputmode="numeric" placeholder="Gs.">
+      <label class="col-4"><span>Monto de Ingreso<span class="required-mark">*</span></span>
+        <input type="text" name="lab_monto_ingreso" inputmode="numeric" placeholder="Gs." required>
       </label>
-      <label class="col-4">Antigüedad
-        <input type="text" name="lab_antiguedad">
+      <label class="col-4"><span>Antigüedad<span class="required-mark">*</span></span>
+        <input type="text" name="lab_antiguedad" required>
       </label>
     </div>
   </section>
@@ -155,8 +155,8 @@
     <h2>Ingresos y Egresos (expresados en guaraníes)</h2>
     <div class="grid two-col-money">
       <div class="money-col">
-        <label>Sueldo
-          <input type="text" name="ing_sueldo" class="money" inputmode="numeric" placeholder="Gs.">
+        <label><span>Sueldo<span class="required-mark">*</span></span>
+          <input type="text" name="ing_sueldo" class="money" inputmode="numeric" placeholder="Gs." required>
         </label>
         <label>Sueldo Cónyuge
           <input type="text" name="ing_sueldo_conyuge" class="money" inputmode="numeric" placeholder="Gs.">
@@ -201,11 +201,11 @@
   <section class="tab-panel" data-panel="referencias">
     <h2>Referencias Comerciales (Otros)</h2>
     <div class="grid">
-      <label class="col-7">Entidad
-        <input type="text" name="refcom1_entidad">
+      <label class="col-7"><span>Entidad<span class="required-mark">*</span></span>
+        <input type="text" name="refcom1_entidad" required>
       </label>
-      <label class="col-5">Teléfono
-        <input type="text" name="refcom1_telefono" inputmode="tel">
+      <label class="col-5"><span>Teléfono<span class="required-mark">*</span></span>
+        <input type="text" name="refcom1_telefono" inputmode="tel" required>
       </label>
       <label class="col-7">Entidad
         <input type="text" name="refcom2_entidad">
@@ -217,14 +217,14 @@
 
     <h2>Referencias Personales (Pariente o Amigo)</h2>
     <div class="grid">
-      <label class="col-5">Nombres y Apellidos
-        <input type="text" name="refper1_nombre">
+      <label class="col-5"><span>Nombres y Apellidos<span class="required-mark">*</span></span>
+        <input type="text" name="refper1_nombre" required>
       </label>
-      <label class="col-4">Número de Celular
-        <input type="text" name="refper1_celular" inputmode="tel">
+      <label class="col-4"><span>Número de Celular<span class="required-mark">*</span></span>
+        <input type="text" name="refper1_celular" inputmode="tel" required>
       </label>
-      <label class="col-3">Vínculo
-        <input type="text" name="refper1_vinculo">
+      <label class="col-3"><span>Vínculo<span class="required-mark">*</span></span>
+        <input type="text" name="refper1_vinculo" required>
       </label>
       <label class="col-5">Nombres y Apellidos
         <input type="text" name="refper2_nombre">

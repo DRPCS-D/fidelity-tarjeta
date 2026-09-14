@@ -45,6 +45,46 @@ form.addEventListener("change", (e) => {
 });
 refreshConditionalInputs();
 
+// ---------- Validación de campos obligatorios (marcados con "*") ----------
+const REQUIRED_FIELDS = [
+  "tit_nombre", "tit_ci", "tit_monto_solicitado", "tit_nacionalidad", "tit_sexo",
+  "tit_fecha_nac", "tit_vivienda", "tit_estado_civil", "tit_celular",
+  "dom_direccion", "dom_barrio", "dom_ciudad",
+  "lab_empresa", "lab_tipo_empleo", "lab_cargo", "lab_monto_ingreso", "lab_antiguedad",
+  "ing_sueldo",
+  "refcom1_entidad", "refcom1_telefono", "refper1_nombre", "refper1_celular", "refper1_vinculo",
+];
+
+// Campos que solo se vuelven obligatorios según otra respuesta (p. ej.
+// "Vivienda: Otra" exige especificar cuál).
+function getConditionalRequiredFields() {
+  const extra = [];
+  if (form.elements["tit_vivienda"].value === "Otra") extra.push("tit_vivienda_otra");
+  if (form.elements["lab_tipo_empleo"].value === "Otro") extra.push("lab_tipo_empleo_otro");
+  return extra;
+}
+
+// Devuelve el nombre del primer campo obligatorio vacío, o null si está todo completo.
+// (No se usa validación nativa del navegador porque los pasos no activos
+// tienen display:none, y los campos ocultos quedan excluidos de esa validación.)
+function findFirstMissingRequiredField() {
+  for (const name of REQUIRED_FIELDS.concat(getConditionalRequiredFields())) {
+    const el = form.elements[name];
+    if (!el) continue;
+    if (!(el.value || "").toString().trim()) return name;
+  }
+  return null;
+}
+
+function goToFieldStep(name) {
+  const el = form.querySelector(`[name="${name}"]`);
+  if (!el) return;
+  const panel = el.closest(".tab-panel");
+  const index = Array.from(panels).indexOf(panel);
+  if (index !== -1) showStep(index);
+  el.focus();
+}
+
 // ---------- Autocálculo de Ingresos / Egresos ----------
 function parseMoney(str) {
   if (!str) return 0;
@@ -143,9 +183,10 @@ termsCheckbox.addEventListener("change", updateSendEnabled);
 updateSendEnabled();
 
 btnSend.addEventListener("click", async () => {
-  const nombre = (form.elements["tit_nombre"].value || "").trim();
-  if (!nombre) {
-    setSendMsg("Completá al menos el nombre del titular antes de enviar.", "error");
+  const missing = findFirstMissingRequiredField();
+  if (missing) {
+    goToFieldStep(missing);
+    setSendMsg(`Falta completar el campo obligatorio "${FIELD_LABELS[missing] || missing}".`, "error");
     return;
   }
   if (!termsCheckbox.checked) {
