@@ -104,16 +104,6 @@ function recalcTotals() {
 }
 document.querySelectorAll(".money").forEach((el) => el.addEventListener("input", recalcTotals));
 
-// ---------- Reset ----------
-document.getElementById("btn-reset").addEventListener("click", () => {
-  if (!confirm("¿Limpiar todos los datos del formulario?")) return;
-  form.reset();
-  recalcTotals();
-  refreshConditionalInputs();
-  updateSendEnabled();
-  setSendMsg("", "");
-});
-
 // ---------- Utilidades de fecha ----------
 function splitDate(isoValue) {
   // isoValue: "YYYY-MM-DD"
