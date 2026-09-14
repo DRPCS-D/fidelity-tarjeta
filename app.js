@@ -52,7 +52,8 @@ const REQUIRED_FIELDS = [
   "dom_direccion", "dom_barrio", "dom_ciudad",
   "lab_empresa", "lab_tipo_empleo", "lab_cargo", "lab_monto_ingreso", "lab_antiguedad",
   "ing_sueldo",
-  "refcom1_entidad", "refcom1_telefono", "refper1_nombre", "refper1_celular", "refper1_vinculo",
+  "refper1_nombre", "refper1_celular", "refper1_vinculo",
+  "refper2_nombre", "refper2_celular", "refper2_vinculo",
 ];
 
 // Campos que solo se vuelven obligatorios según otra respuesta (p. ej.
