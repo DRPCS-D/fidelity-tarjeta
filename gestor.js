@@ -38,6 +38,7 @@ function tryLogin() {
 
 // ---------- Carga de datos ----------
 const listStatus = document.getElementById("list-status");
+const loadingOverlay = document.getElementById("loading-overlay");
 function setListStatus(msg, type) {
   listStatus.textContent = msg;
   listStatus.className = "status-msg" + (type ? " " + type : "");
@@ -48,7 +49,8 @@ async function loadRecords() {
     setListStatus("Falta configurar SHEETS_API_URL en config.js (ver README).", "error");
     return;
   }
-  setListStatus("Cargando solicitudes…", "");
+  setListStatus("", "");
+  loadingOverlay.hidden = false;
   try {
     const url = `${SHEETS_API_URL}?action=list&token=${encodeURIComponent(API_TOKEN)}`;
     const res = await fetch(url);
@@ -61,6 +63,8 @@ async function loadRecords() {
   } catch (err) {
     console.error(err);
     setListStatus("Error al cargar las solicitudes: " + err.message, "error");
+  } finally {
+    loadingOverlay.hidden = true;
   }
 }
 document.getElementById("btn-refresh").addEventListener("click", loadRecords);
@@ -70,6 +74,7 @@ const filtersDropdown = document.getElementById("filters-dropdown");
 const filtersToggle = document.getElementById("filters-toggle");
 const filtersPanel = document.getElementById("filters-panel");
 const filtersBadge = document.getElementById("filters-badge");
+const filterEstadoSelect = document.getElementById("filter-estado");
 const filterDateFromInput = document.getElementById("filter-date-from");
 const filterDateToInput = document.getElementById("filter-date-to");
 
@@ -93,8 +98,7 @@ function updateFiltersBadge() {
 }
 
 function applyFiltersFromPanel() {
-  const checked = document.querySelector('input[name="estado-filter"]:checked');
-  currentFilter = checked ? checked.value : "Todos";
+  currentFilter = filterEstadoSelect.value;
 
   const fromVal = filterDateFromInput.value;
   const toVal = filterDateToInput.value;
@@ -108,7 +112,7 @@ function applyFiltersFromPanel() {
 document.getElementById("filters-apply").addEventListener("click", applyFiltersFromPanel);
 
 document.getElementById("filters-clear").addEventListener("click", () => {
-  document.querySelector('input[name="estado-filter"][value="Todos"]').checked = true;
+  filterEstadoSelect.value = "Todos";
   filterDateFromInput.value = "";
   filterDateToInput.value = "";
   currentFilter = "Todos";

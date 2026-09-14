@@ -36,21 +36,24 @@
       </button>
       <div class="filters-panel" id="filters-panel" hidden>
         <div class="filters-group">
-          <span class="filters-label">Estado</span>
-          <div class="filters-radio-list">
-            <label><input type="radio" name="estado-filter" value="Todos" checked> Todos</label>
-            <label><input type="radio" name="estado-filter" value="Pendiente"> Pendientes</label>
-            <label><input type="radio" name="estado-filter" value="Aprobado"> Aprobados</label>
-            <label><input type="radio" name="estado-filter" value="Rechazado"> Rechazados</label>
+          <label class="filters-label" for="filter-estado">Estado</label>
+          <select id="filter-estado">
+            <option value="Todos" selected>Todos</option>
+            <option value="Pendiente">Pendientes</option>
+            <option value="Aprobado">Aprobados</option>
+            <option value="Rechazado">Rechazados</option>
+          </select>
+        </div>
+        <div class="filters-group">
+          <span class="filters-label">Rango de fechas</span>
+          <div class="filters-date-row">
+            <label class="filters-date-field"><span>Desde</span>
+              <input type="date" id="filter-date-from">
+            </label>
+            <label class="filters-date-field"><span>Hasta</span>
+              <input type="date" id="filter-date-to">
+            </label>
           </div>
-        </div>
-        <div class="filters-group">
-          <label class="filters-label" for="filter-date-from">Fecha desde</label>
-          <input type="date" id="filter-date-from">
-        </div>
-        <div class="filters-group">
-          <label class="filters-label" for="filter-date-to">Fecha hasta</label>
-          <input type="date" id="filter-date-to">
         </div>
         <div class="filters-actions">
           <button type="button" id="filters-clear" class="btn secondary btn-sm">Limpiar</button>
@@ -59,11 +62,19 @@
       </div>
     </div>
     <input type="search" id="search-input" placeholder="Buscar por nombre o C.I...." class="search-input">
-    <button type="button" id="btn-export" class="btn secondary">Exportar a Excel</button>
-    <button type="button" id="btn-refresh" class="btn secondary">Actualizar</button>
+    <button type="button" id="btn-export" class="btn secondary icon-btn" title="Exportar a Excel" aria-label="Exportar a Excel">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 19h16"/></svg>
+    </button>
+    <button type="button" id="btn-refresh" class="btn secondary icon-btn" title="Actualizar" aria-label="Actualizar">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+    </button>
   </div>
 
   <p id="list-status" class="status-msg"></p>
+
+  <div id="loading-overlay" class="loading-overlay" hidden>
+    <div class="spinner"></div>
+  </div>
 
   <div class="table-wrap">
     <table class="records-table" id="records-table">
@@ -106,9 +117,6 @@
   </div>
 </div>
 
-<footer class="app-footer">
-  <p>Los datos provienen de la planilla de Google Sheets configurada en config.js.</p>
-</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
