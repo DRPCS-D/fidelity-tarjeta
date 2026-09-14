@@ -123,8 +123,14 @@ document.getElementById("filters-clear").addEventListener("click", () => {
   toggleFiltersPanel(false);
 });
 
+// Quita tildes/diacríticos para que la búsqueda no distinga acentos
+// (p. ej. "jose" encuentra "José").
+function normalizeText(str) {
+  return String(str || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+}
+
 document.getElementById("search-input").addEventListener("input", (e) => {
-  currentSearch = e.target.value.trim().toLowerCase();
+  currentSearch = normalizeText(e.target.value.trim());
   renderTable();
 });
 
@@ -192,7 +198,7 @@ function getFilteredRecords() {
       if (currentDateTo && d > currentDateTo) return false;
     }
     if (currentSearch) {
-      const haystack = `${r.tit_nombre || ""} ${r.tit_ci || ""}`.toLowerCase();
+      const haystack = normalizeText(`${r.tit_nombre || ""} ${r.tit_ci || ""}`);
       if (!haystack.includes(currentSearch)) return false;
     }
     return true;
