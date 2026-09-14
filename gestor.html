@@ -91,11 +91,17 @@
       <button type="button" id="detail-close" class="btn secondary">Cerrar</button>
     </div>
     <div id="detail-body" class="modal-body"></div>
-    <div class="modal-footer">
+    <div class="modal-footer" id="detail-footer-view">
       <button type="button" id="detail-download" class="btn secondary">Descargar PDF</button>
+      <button type="button" id="detail-edit" class="btn secondary">Editar</button>
       <span class="modal-footer-spacer"></span>
       <button type="button" id="detail-reject" class="btn danger">Rechazar</button>
       <button type="button" id="detail-approve" class="btn success">Aprobar</button>
+    </div>
+    <div class="modal-footer" id="detail-footer-edit" hidden>
+      <button type="button" id="detail-cancel-edit" class="btn secondary">Cancelar</button>
+      <span class="modal-footer-spacer"></span>
+      <button type="button" id="detail-save" class="btn primary">Guardar cambios</button>
     </div>
   </div>
 </div>

@@ -50,6 +50,7 @@ const FIELD_NAMES = [
   "card_interes_punitorio", "card_gestion_recupero",
   "seg_sucursal", "seg_poliza", "seg_asegurado", "seg_documento", "seg_domicilio", "seg_localidad",
   "seg_emision", "seg_vigencia_desde", "seg_vigencia_hasta", "seg_plazo", "seg_capital",
+  "egr_otros_detalle", "ing_otros_detalle",
 ];
 
 // Columnas fijas al principio de la planilla.
@@ -131,6 +132,14 @@ function doGet(e) {
     return handleRepairDates_();
   }
 
+  // Acción de mantenimiento: agrega al final de la planilla las columnas
+  // que falten (por ejemplo, campos nuevos agregados a FIELD_NAMES después
+  // de que la planilla ya tenía datos, como egr_otros_detalle). Se puede
+  // llamar una sola vez después de actualizar este script.
+  if (action === "syncColumns") {
+    return handleSyncColumns_();
+  }
+
   return jsonResponse_({ ok: false, error: "Acción desconocida: " + action });
 }
 
@@ -153,6 +162,9 @@ function doPost(e) {
   }
   if (action === "updateStatus") {
     return handleUpdateStatus_(body);
+  }
+  if (action === "update") {
+    return handleUpdateRecord_(body);
   }
   if (action === "bulkImport") {
     return handleBulkImport_(body);
@@ -215,6 +227,39 @@ function handleUpdateStatus_(body) {
   return jsonResponse_({ ok: false, error: "No se encontró la solicitud con id " + id });
 }
 
+// Edición desde el Panel de gestión: actualiza uno o varios campos de una
+// solicitud ya guardada. body.id y body.data = { nombre_columna: valor, ... }.
+// No permite tocar las columnas fijas (id, timestamp, estado) por esta vía.
+function handleUpdateRecord_(body) {
+  const id = body.id;
+  const data = body.data || {};
+  if (!id) {
+    return jsonResponse_({ ok: false, error: "Falta id." });
+  }
+
+  const sheet = getSheet_();
+  const values = sheet.getDataRange().getValues();
+  const headers = values[0];
+  const idCol = headers.indexOf("id");
+
+  for (let r = 1; r < values.length; r++) {
+    if (String(values[r][idCol]) === String(id)) {
+      const rowIndex = r + 1;
+      Object.keys(data).forEach((colName) => {
+        if (FIXED_COLUMNS.indexOf(colName) !== -1) return;
+        const colIndex = headers.indexOf(colName);
+        if (colIndex === -1) return;
+        if (DATE_COLUMNS.indexOf(colName) !== -1) {
+          sheet.getRange(rowIndex, colIndex + 1).setNumberFormat("@");
+        }
+        sheet.getRange(rowIndex, colIndex + 1).setValue(data[colName]);
+      });
+      return jsonResponse_({ ok: true });
+    }
+  }
+  return jsonResponse_({ ok: false, error: "No se encontró la solicitud con id " + id });
+}
+
 // Importación masiva: recibe muchas filas en un solo POST y las escribe
 // de una sola vez (mucho más rápido y confiable que llamar "create" una
 // por una). body.rows = [{ id, timestamp, estado, data: {...} }, ...]
@@ -248,6 +293,17 @@ function handleBulkImport_(body) {
 
   sheet.getRange(startRow, 1, matrix.length, ALL_COLUMNS.length).setValues(matrix);
   return jsonResponse_({ ok: true, imported: matrix.length });
+}
+
+function handleSyncColumns_() {
+  const sheet = getSheet_();
+  const lastCol = sheet.getLastColumn();
+  const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  const missing = ALL_COLUMNS.filter((c) => headers.indexOf(c) === -1);
+  if (missing.length) {
+    sheet.getRange(1, lastCol + 1, 1, missing.length).setValues([missing]);
+  }
+  return jsonResponse_({ ok: true, added: missing });
 }
 
 function handleRepairDates_() {

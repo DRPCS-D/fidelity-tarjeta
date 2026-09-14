@@ -22,7 +22,7 @@
   <button class="tab-btn" data-tab="finanzas">Ingresos / Egresos</button>
   <button class="tab-btn" data-tab="referencias">Referencias</button>
   <button class="tab-btn" data-tab="conyuge">Cónyuge / Adicional</button>
-  <button class="tab-btn" data-tab="firmas">Registro de Firmas</button>
+  <button class="tab-btn" data-tab="firmas" hidden>Registro de Firmas</button>
   <button class="tab-btn" data-tab="tarjeta">Datos de Tarjeta</button>
   <button class="tab-btn" data-tab="seguro">Seguro Crediticio</button>
 </nav>
@@ -33,21 +33,15 @@
   <section class="tab-panel active" data-panel="titular">
     <h2>Datos del Titular</h2>
     <div class="grid">
-      <label class="col-8">Nombres y Apellidos
+      <label class="col-12">Nombres y Apellidos
         <input type="text" name="tit_nombre" autocomplete="off">
-      </label>
-      <label class="col-4">Fecha de la solicitud
-        <input type="date" name="tit_fecha_solicitud">
       </label>
 
       <label class="col-6">Número Doc. Identidad
         <input type="text" name="tit_ci" inputmode="numeric">
       </label>
-      <label class="col-3">Monto Solicitado
+      <label class="col-6">Monto Solicitado
         <input type="text" name="tit_monto_solicitado" inputmode="numeric" placeholder="Gs.">
-      </label>
-      <label class="col-3">Monto Concedido
-        <input type="text" name="tit_monto_concedido" inputmode="numeric" placeholder="Gs.">
       </label>
 
       <label class="col-4">Nacionalidad
@@ -173,6 +167,9 @@
         <label>Otros ingresos
           <input type="text" name="ing_otros" class="money" inputmode="numeric" placeholder="Gs.">
         </label>
+        <label>¿De qué es? (especificar)
+          <input type="text" name="ing_otros_detalle" placeholder="Ej: Comisiones">
+        </label>
         <label class="total"><strong>TOTAL INGRESOS</strong>
           <input type="text" name="ing_total" readonly>
         </label>
@@ -187,8 +184,11 @@
         <label>Alquiler pagado
           <input type="text" name="egr_alquiler" class="money" inputmode="numeric" placeholder="Gs.">
         </label>
-        <label>Otros egresos (especificar)
+        <label>Otros egresos
           <input type="text" name="egr_otros" class="money" inputmode="numeric" placeholder="Gs.">
+        </label>
+        <label>¿De qué es? (especificar)
+          <input type="text" name="egr_otros_detalle" placeholder="Ej: Seguro médico">
         </label>
         <label class="total"><strong>TOTAL EGRESOS</strong>
           <input type="text" name="egr_total" readonly>
@@ -300,7 +300,7 @@
   </section>
 
   <!-- ============ REGISTRO DE FIRMAS ============ -->
-  <section class="tab-panel" data-panel="firmas">
+  <section class="tab-panel" data-panel="firmas" hidden>
     <h2>Formulario de Registro de Firmas</h2>
     <p class="hint">Los espacios de firma, aclaración y Nº de C.I. de la Declaración Jurada quedan en blanco en el PDF para completarse a mano.</p>
     <div class="grid">
@@ -387,11 +387,22 @@
         <input type="text" name="seg_capital" inputmode="numeric">
       </label>
     </div>
+
+    <h2>Declaración Jurada y Autorización</h2>
+    <div class="terms-box">
+      <div class="terms-text">Declaramos bajo fe de juramento que la información y los datos presentados a FIDELITY GROUP S.A. en este formulario son correctos y absolutamente verdaderos y tanto ella como los demás documentos adjuntos corresponden al fiel reflejo de la realidad de nuestra situación patrimonial. Al mismo tiempo, nos comprometemos a informar por escrito a FIDELITY GROUP S.A. cualquier modificación aquí suministrada. Autorizamos irrevocablemente a FIDELITY GROUP S.A. otorgándole mandato suficiente en los términos del Art. 917 Inc. A del Código Civil para que por cuenta propia o de terceros proceda a verificar y proveer cualquier información que pueda afectar a la relación de confiabilidad y/o solvencia necesaria para la utilización de los servicios y realizar operaciones crediticias, a consultar a empresas, a recabar y proveer a cualquier persona información sobre nuestra situación patrimonial, solvencia económica, operaciones activas y pasivas, comportamiento de pago, cumplimiento o no de nuestras obligaciones. Asimismo, declaramos haber recibido el CONTRATO ÚNICO, el cual reconocemos haber leído íntegramente, habiendo comprometido sus términos, condiciones, obligaciones y derechos allí previstos, a los cuales nos adherimos expresamente mediante la firma de la presente solicitud. En este sentido, reconocemos haber sido informados por FIDELITY GROUP S.A. de las características esenciales de los productos bancarios contratados, específicamente sobre los derechos y obligaciones, los costos y gastos, la cancelación, el procedimiento de reclamos y los derechos consagrados en la Ley Nº 1334/98 de Defensa al Consumidor o Usuarios y sus reglamentaciones. Así también reconocemos al presente documento como suficiente instrumento jurídico, y como único fuero competente la circunscripción de Ciudad Del Este. Nos obligamos a leer íntegramente las eventuales modificaciones y actualizaciones del Contrato de Fidelity Group.</div>
+      <label class="terms-check">
+        <input type="checkbox" id="terms-accept">
+        <span>He leído y acepto los términos de la declaración jurada y autorización detallados arriba.</span>
+      </label>
+    </div>
   </section>
 
   <div class="actions">
     <button type="button" id="btn-reset" class="btn secondary">Limpiar formulario</button>
-    <button type="button" id="btn-send" class="btn primary">Enviar registro a la planilla</button>
+    <button type="button" id="btn-prev" class="btn secondary" hidden>Anterior</button>
+    <button type="button" id="btn-next" class="btn primary">Siguiente</button>
+    <button type="button" id="btn-send" class="btn primary" hidden disabled>Enviar registro a la planilla</button>
   </div>
   <p id="send-msg" class="status-msg" role="status"></p>
 </form>

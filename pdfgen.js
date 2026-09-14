@@ -38,8 +38,15 @@ async function generateFidelityPdf(dataset) {
 
   // ---- campos de texto simples (incluye las fechas libres de pág. 4,
   //      que ya llegan formateadas como "dd/mm/aaaa") ----
+  const OTROS_DETALLE_MAP = { ing_otros: "ing_otros_detalle", egr_otros: "egr_otros_detalle" };
   for (const f of TEXT_FIELDS) {
-    const value = get(f.name);
+    let value = get(f.name);
+    const detalleField = OTROS_DETALLE_MAP[f.name];
+    if (detalleField) {
+      const detalle = get(detalleField);
+      if (detalle && value) value = `${detalle} - Gs. ${value}`;
+      else if (detalle) value = detalle;
+    }
     if (!value) continue;
     drawFitted(pages[f.page], value, f.x, f.yTop, f.size, f.maxWidth, f.bold ? fontBold : font, black);
   }

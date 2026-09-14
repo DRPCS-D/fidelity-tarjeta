@@ -5,18 +5,30 @@
 
 const form = document.getElementById("fidelity-form");
 
-// ---------- Navegación por tabs ----------
-const tabButtons = document.querySelectorAll(".tab-btn");
-const panels = document.querySelectorAll(".tab-panel");
+// ---------- Navegación por tabs / pasos ----------
+const tabButtons = document.querySelectorAll(".tab-btn:not([hidden])");
+const panels = document.querySelectorAll(".tab-panel:not([hidden])");
+const btnPrev = document.getElementById("btn-prev");
+const btnNext = document.getElementById("btn-next");
+const btnSend = document.getElementById("btn-send");
+const lastStepIndex = panels.length - 1;
+let currentStep = 0;
 
-tabButtons.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    tabButtons.forEach((b) => b.classList.remove("active"));
-    panels.forEach((p) => p.classList.remove("active"));
-    btn.classList.add("active");
-    document.querySelector(`.tab-panel[data-panel="${btn.dataset.tab}"]`).classList.add("active");
-  });
+function showStep(index) {
+  currentStep = Math.max(0, Math.min(index, lastStepIndex));
+  tabButtons.forEach((b, i) => b.classList.toggle("active", i === currentStep));
+  panels.forEach((p, i) => p.classList.toggle("active", i === currentStep));
+  btnPrev.hidden = currentStep === 0;
+  btnNext.hidden = currentStep === lastStepIndex;
+  btnSend.hidden = currentStep !== lastStepIndex;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+tabButtons.forEach((btn, i) => {
+  btn.addEventListener("click", () => showStep(i));
 });
+btnPrev.addEventListener("click", () => showStep(currentStep - 1));
+btnNext.addEventListener("click", () => showStep(currentStep + 1));
 
 // ---------- Campos condicionales ("Otra/Otro: Especificar") ----------
 function refreshConditionalInputs() {
@@ -57,6 +69,7 @@ document.getElementById("btn-reset").addEventListener("click", () => {
   form.reset();
   recalcTotals();
   refreshConditionalInputs();
+  updateSendEnabled();
   setSendMsg("", "");
 });
 
@@ -80,14 +93,24 @@ function setSendMsg(msg, type) {
   sendMsg.className = "status-msg" + (type ? " " + type : "");
 }
 
-const DATE_INPUT_NAMES = ["tit_fecha_solicitud", "tit_fecha_nac", "con_fecha_nac", "seg_emision", "seg_vigencia_desde", "seg_vigencia_hasta"];
+const DATE_INPUT_NAMES = ["tit_fecha_nac", "con_fecha_nac", "seg_emision", "seg_vigencia_desde", "seg_vigencia_hasta"];
+
+function todayDMY() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+}
 
 function collectFormData() {
   const data = new FormData(form);
   const get = (name) => (data.get(name) || "").toString().trim();
   const result = {};
   for (const name of ALL_FIELD_NAMES) {
-    result[name] = DATE_INPUT_NAMES.includes(name) ? formatDateDMY(get(name)) : get(name);
+    if (name === "tit_fecha_solicitud") {
+      result[name] = todayDMY();
+    } else {
+      result[name] = DATE_INPUT_NAMES.includes(name) ? formatDateDMY(get(name)) : get(name);
+    }
   }
   return result;
 }
@@ -111,14 +134,25 @@ async function sendRecord() {
   return json;
 }
 
-document.getElementById("btn-send").addEventListener("click", async () => {
-  const btn = document.getElementById("btn-send");
+// ---------- Aceptación de términos ----------
+const termsCheckbox = document.getElementById("terms-accept");
+function updateSendEnabled() {
+  btnSend.disabled = !termsCheckbox.checked;
+}
+termsCheckbox.addEventListener("change", updateSendEnabled);
+updateSendEnabled();
+
+btnSend.addEventListener("click", async () => {
   const nombre = (form.elements["tit_nombre"].value || "").trim();
   if (!nombre) {
     setSendMsg("Completá al menos el nombre del titular antes de enviar.", "error");
     return;
   }
-  btn.disabled = true;
+  if (!termsCheckbox.checked) {
+    setSendMsg("Debés aceptar la declaración jurada antes de enviar.", "error");
+    return;
+  }
+  btnSend.disabled = true;
   setSendMsg("Enviando registro…", "");
   try {
     await sendRecord();
@@ -127,6 +161,6 @@ document.getElementById("btn-send").addEventListener("click", async () => {
     console.error(err);
     setSendMsg("Ocurrió un error al enviar el registro: " + err.message, "error");
   } finally {
-    btn.disabled = false;
+    updateSendEnabled();
   }
 });

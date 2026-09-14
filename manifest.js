@@ -34,6 +34,8 @@ const ALL_FIELD_NAMES = [
   // Seguro
   "seg_sucursal", "seg_poliza", "seg_asegurado", "seg_documento", "seg_domicilio", "seg_localidad",
   "seg_emision", "seg_vigencia_desde", "seg_vigencia_hasta", "seg_plazo", "seg_capital",
+  // Campos nuevos, agregados al final para no romper el orden de columnas ya existentes
+  "egr_otros_detalle", "ing_otros_detalle",
 ];
 
 const FIELD_LABELS = {
@@ -120,6 +122,8 @@ const FIELD_LABELS = {
   seg_vigencia_hasta: "Seguro - Vigencia hasta",
   seg_plazo: "Seguro - Plazo",
   seg_capital: "Seguro - Capital Asegurado",
+  egr_otros_detalle: "Otros egresos (detalle)",
+  ing_otros_detalle: "Otros ingresos (detalle)",
 };
 
 // Grupos usados para armar la vista de detalle del panel de gestión.
@@ -127,7 +131,7 @@ const FIELD_GROUPS = [
   { title: "Datos del Titular", fields: ["tit_nombre","tit_fecha_solicitud","tit_ci","tit_monto_solicitado","tit_monto_concedido","tit_nacionalidad","tit_sexo","tit_fecha_nac","tit_vivienda","tit_vivienda_otra","tit_estado_civil","tit_celular","tit_email","meta_sucursal","meta_seccion","meta_captador"] },
   { title: "Domicilio Particular", fields: ["dom_direccion","dom_barrio","dom_ciudad","dom_obs"] },
   { title: "Datos Laborales", fields: ["lab_empresa","lab_celular","lab_direccion","lab_tipo_empleo","lab_tipo_empleo_otro","lab_cargo","lab_monto_ingreso","lab_antiguedad"] },
-  { title: "Ingresos y Egresos", fields: ["ing_sueldo","ing_sueldo_conyuge","ing_jubilacion","ing_otros","ing_total","egr_gastos_familiares","egr_cuota_prestamos","egr_alquiler","egr_otros","egr_total"] },
+  { title: "Ingresos y Egresos", fields: ["ing_sueldo","ing_sueldo_conyuge","ing_jubilacion","ing_otros","ing_otros_detalle","ing_total","egr_gastos_familiares","egr_cuota_prestamos","egr_alquiler","egr_otros","egr_otros_detalle","egr_total"] },
   { title: "Referencias", fields: ["refcom1_entidad","refcom1_telefono","refcom2_entidad","refcom2_telefono","refper1_nombre","refper1_celular","refper1_vinculo","refper2_nombre","refper2_celular","refper2_vinculo"] },
   { title: "Cónyuge / Adicional", fields: ["con_nombre","con_nacionalidad","con_ci","con_sexo","con_fecha_nac","conlab_empresa","conlab_celular","conlab_direccion","conlab_tipo_empleo","conlab_tipo_empleo_otro","conlab_cargo","conlab_monto_ingreso","conlab_antiguedad"] },
   { title: "Registro de Firmas", fields: ["firma_nombres","firma_apellidos"] },

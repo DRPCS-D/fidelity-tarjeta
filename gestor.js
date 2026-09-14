@@ -234,35 +234,142 @@ tbody.addEventListener("click", (e) => {
   openDetail(tr.dataset.id);
 });
 
-// ---------- Modal de detalle ----------
+// ---------- Modal de detalle (con pestañas y edición) ----------
 const modal = document.getElementById("detail-modal");
 const detailBody = document.getElementById("detail-body");
 const detailTitle = document.getElementById("detail-title");
+const footerView = document.getElementById("detail-footer-view");
+const footerEdit = document.getElementById("detail-footer-edit");
+
+let editMode = false;
+let activeDetailTabIndex = 0;
+
+// Campos con opciones fijas (radios en el formulario): se editan con <select>
+// reutilizando las mismas opciones definidas en fields.js (CHECKBOX_GROUPS).
+const SELECT_FIELD_NAMES = Object.keys(CHECKBOX_GROUPS);
+
+function buildFieldInput(fieldName, value) {
+  if (SELECT_FIELD_NAMES.includes(fieldName)) {
+    const options = Object.keys(CHECKBOX_GROUPS[fieldName].options);
+    const optsHtml = [`<option value="">—</option>`]
+      .concat(options.map((o) => `<option value="${escapeHtml(o)}"${value === o ? " selected" : ""}>${escapeHtml(o)}</option>`))
+      .join("");
+    return `<select class="detail-input" data-field="${fieldName}">${optsHtml}</select>`;
+  }
+  return `<input type="text" class="detail-input" data-field="${fieldName}" value="${escapeHtml(value || "")}">`;
+}
+
+function renderDetailBody(record) {
+  let html = `<div class="detail-estado">Estado actual: <span class="${estadoBadgeClass(record.estado)}">${escapeHtml(record.estado || "Pendiente")}</span></div>`;
+
+  html += `<div class="detail-tabs">`;
+  FIELD_GROUPS.forEach((group, i) => {
+    html += `<button type="button" class="detail-tab-btn${i === activeDetailTabIndex ? " active" : ""}" data-tab-index="${i}">${escapeHtml(group.title)}</button>`;
+  });
+  html += `</div><div class="detail-tab-panels">`;
+
+  FIELD_GROUPS.forEach((group, i) => {
+    html += `<div class="detail-tab-panel${i === activeDetailTabIndex ? " active" : ""}" data-tab-index="${i}">`;
+    if (editMode) {
+      html += group.fields.map((f) => `<label class="detail-edit-row">${FIELD_LABELS[f] || f}${buildFieldInput(f, record[f])}</label>`).join("");
+    } else {
+      const rowsHtml = group.fields
+        .filter((f) => record[f] !== undefined && record[f] !== "")
+        .map((f) => {
+          const value = MONEY_FIELDS.has(f) ? formatMoney(record[f]) : record[f];
+          return `<div class="detail-row"><span class="detail-label">${FIELD_LABELS[f] || f}</span><span class="detail-value">${escapeHtml(value)}</span></div>`;
+        })
+        .join("");
+      html += rowsHtml || `<p class="hint">Sin datos cargados en esta sección.</p>`;
+    }
+    html += `</div>`;
+  });
+  html += `</div>`;
+
+  detailBody.innerHTML = html;
+
+  detailBody.querySelectorAll(".detail-tab-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      activeDetailTabIndex = Number(btn.dataset.tabIndex);
+      detailBody.querySelectorAll(".detail-tab-btn").forEach((b) => b.classList.toggle("active", b === btn));
+      detailBody.querySelectorAll(".detail-tab-panel").forEach((p) => p.classList.toggle("active", Number(p.dataset.tabIndex) === activeDetailTabIndex));
+    });
+  });
+}
+
+function updateFooterMode() {
+  footerView.hidden = editMode;
+  footerEdit.hidden = !editMode;
+}
+
+function getSelectedRecord() {
+  return allRecords.find((r) => String(r.id) === String(selectedRecordId));
+}
 
 function openDetail(id) {
   const record = allRecords.find((r) => String(r.id) === String(id));
   if (!record) return;
   selectedRecordId = id;
+  editMode = false;
+  activeDetailTabIndex = 0;
   detailTitle.textContent = `Solicitud de ${record.tit_nombre || "—"}`;
-
-  let html = `<div class="detail-estado">Estado actual: <span class="${estadoBadgeClass(record.estado)}">${escapeHtml(record.estado || "Pendiente")}</span></div>`;
-  for (const group of FIELD_GROUPS) {
-    const rowsHtml = group.fields
-      .filter((f) => record[f] !== undefined && record[f] !== "")
-      .map((f) => {
-        const value = MONEY_FIELDS.has(f) ? formatMoney(record[f]) : record[f];
-        return `<div class="detail-row"><span class="detail-label">${FIELD_LABELS[f] || f}</span><span class="detail-value">${escapeHtml(value)}</span></div>`;
-      })
-      .join("");
-    if (!rowsHtml) continue;
-    html += `<div class="detail-group"><h3>${group.title}</h3>${rowsHtml}</div>`;
-  }
-  detailBody.innerHTML = html;
+  renderDetailBody(record);
+  updateFooterMode();
   modal.hidden = false;
 }
 
 document.getElementById("detail-close").addEventListener("click", () => { modal.hidden = true; });
 modal.addEventListener("click", (e) => { if (e.target === modal) modal.hidden = true; });
+
+document.getElementById("detail-edit").addEventListener("click", () => {
+  const record = getSelectedRecord();
+  if (!record) return;
+  editMode = true;
+  renderDetailBody(record);
+  updateFooterMode();
+});
+
+document.getElementById("detail-cancel-edit").addEventListener("click", () => {
+  const record = getSelectedRecord();
+  if (!record) return;
+  editMode = false;
+  renderDetailBody(record);
+  updateFooterMode();
+});
+
+document.getElementById("detail-save").addEventListener("click", async () => {
+  const record = getSelectedRecord();
+  if (!record) return;
+  const data = {};
+  detailBody.querySelectorAll(".detail-input").forEach((el) => {
+    data[el.dataset.field] = el.value.trim();
+  });
+
+  const saveBtn = document.getElementById("detail-save");
+  saveBtn.disabled = true;
+  const originalLabel = saveBtn.textContent;
+  saveBtn.textContent = "Guardando…";
+  try {
+    const res = await fetch(SHEETS_API_URL, {
+      method: "POST",
+      body: JSON.stringify({ token: API_TOKEN, action: "update", id: selectedRecordId, data }),
+    });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || "Error desconocido.");
+    Object.assign(record, data);
+    editMode = false;
+    detailTitle.textContent = `Solicitud de ${record.tit_nombre || "—"}`;
+    renderDetailBody(record);
+    updateFooterMode();
+    renderTable();
+  } catch (err) {
+    console.error(err);
+    alert("No se pudieron guardar los cambios: " + err.message);
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = originalLabel;
+  }
+});
 
 document.getElementById("detail-approve").addEventListener("click", () => updateStatus("Aprobado"));
 document.getElementById("detail-reject").addEventListener("click", () => updateStatus("Rechazado"));
