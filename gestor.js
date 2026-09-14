@@ -316,7 +316,7 @@ function openDetail(id) {
   selectedRecordId = id;
   editMode = false;
   activeDetailTabIndex = 0;
-  detailTitle.textContent = `Solicitud de ${record.tit_nombre || "—"}`;
+  detailTitle.textContent = record.tit_nombre || "—";
   renderDetailBody(record);
   updateFooterMode();
   modal.hidden = false;
@@ -362,7 +362,7 @@ document.getElementById("detail-save").addEventListener("click", async () => {
     if (!json.ok) throw new Error(json.error || "Error desconocido.");
     Object.assign(record, data);
     editMode = false;
-    detailTitle.textContent = `Solicitud de ${record.tit_nombre || "—"}`;
+    detailTitle.textContent = record.tit_nombre || "—";
     renderDetailBody(record);
     updateFooterMode();
     renderTable();
