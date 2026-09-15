@@ -167,11 +167,6 @@ async function sendRecord() {
 
 // ---------- Aceptación de términos ----------
 const termsCheckbox = document.getElementById("terms-accept");
-function updateSendEnabled() {
-  btnSend.disabled = !termsCheckbox.checked;
-}
-termsCheckbox.addEventListener("change", updateSendEnabled);
-updateSendEnabled();
 
 btnSend.addEventListener("click", async () => {
   const missing = findFirstMissingRequiredField();
@@ -181,7 +176,9 @@ btnSend.addEventListener("click", async () => {
     return;
   }
   if (!termsCheckbox.checked) {
-    setSendMsg("Debés aceptar la declaración jurada antes de enviar.", "error");
+    showStep(lastStepIndex);
+    termsCheckbox.focus();
+    setSendMsg("Falta aceptar la declaración jurada y autorización para poder enviar.", "error");
     return;
   }
   btnSend.disabled = true;
@@ -192,7 +189,8 @@ btnSend.addEventListener("click", async () => {
   } catch (err) {
     console.error(err);
     setSendMsg("Ocurrió un error al enviar el registro: " + err.message, "error");
-    updateSendEnabled();
+  } finally {
+    btnSend.disabled = false;
   }
 });
 
