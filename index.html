@@ -73,7 +73,7 @@
           <label><input type="radio" name="tit_vivienda" value="Alquilada" required> Alquilada</label>
           <label><input type="radio" name="tit_vivienda" value="Otra" required> Otra</label>
         </div>
-        <input type="text" name="tit_vivienda_otra" placeholder="Especificar..." class="conditional-input" data-show-when="tit_vivienda=Otra">
+        <input type="text" name="tit_vivienda_otra" placeholder="Especificar..." class="conditional-input" data-show-when="tit_vivienda=Otra" maxlength="30">
       </div>
       <div class="col-6 field-radio">
         <span class="field-label">Estado Civil<span class="required-mark">*</span></span>
@@ -99,7 +99,7 @@
         <input type="text" name="meta_seccion">
       </label>
       <label class="col-4">Captador
-        <input type="text" name="meta_captador">
+        <input type="text" name="meta_captador" maxlength="20">
       </label>
     </div>
   </section>
@@ -118,7 +118,7 @@
         <input type="text" name="dom_ciudad" required>
       </label>
       <label class="col-12">Obs.
-        <input type="text" name="dom_obs">
+        <input type="text" name="dom_obs" maxlength="60">
       </label>
     </div>
 
@@ -143,17 +143,17 @@
           <label><input type="radio" name="lab_tipo_empleo" value="Jubilado" required> Jubilado/a</label>
           <label><input type="radio" name="lab_tipo_empleo" value="Otro" required> Otro</label>
         </div>
-        <input type="text" name="lab_tipo_empleo_otro" placeholder="Especificar..." class="conditional-input" data-show-when="lab_tipo_empleo=Otro">
+        <input type="text" name="lab_tipo_empleo_otro" placeholder="Especificar..." class="conditional-input" data-show-when="lab_tipo_empleo=Otro" maxlength="30">
       </div>
 
       <label class="col-4"><span>Cargo<span class="required-mark">*</span></span>
-        <input type="text" name="lab_cargo" required>
+        <input type="text" name="lab_cargo" required maxlength="40">
       </label>
       <label class="col-4"><span>Monto de Ingreso<span class="required-mark">*</span></span>
         <input type="text" name="lab_monto_ingreso" inputmode="numeric" placeholder="Gs." required>
       </label>
       <label class="col-4"><span>Antigüedad<span class="required-mark">*</span></span>
-        <input type="text" name="lab_antiguedad" required>
+        <input type="text" name="lab_antiguedad" required maxlength="20">
       </label>
     </div>
   </section>
@@ -176,7 +176,7 @@
           <input type="text" name="ing_otros" class="money" inputmode="numeric" placeholder="Gs.">
         </label>
         <label>¿De qué es? (especificar)
-          <input type="text" name="ing_otros_detalle" placeholder="Ej: Comisiones">
+          <input type="text" name="ing_otros_detalle" placeholder="Ej: Comisiones" maxlength="40">
         </label>
         <label class="total"><strong>TOTAL INGRESOS</strong>
           <input type="text" name="ing_total" readonly>
@@ -196,7 +196,7 @@
           <input type="text" name="egr_otros" class="money" inputmode="numeric" placeholder="Gs.">
         </label>
         <label>¿De qué es? (especificar)
-          <input type="text" name="egr_otros_detalle" placeholder="Ej: Seguro médico">
+          <input type="text" name="egr_otros_detalle" placeholder="Ej: Seguro médico" maxlength="40">
         </label>
         <label class="total"><strong>TOTAL EGRESOS</strong>
           <input type="text" name="egr_total" readonly>
@@ -210,13 +210,13 @@
     <h2>Referencias Comerciales (Otros)</h2>
     <div class="grid">
       <label class="col-7">Entidad
-        <input type="text" name="refcom1_entidad">
+        <input type="text" name="refcom1_entidad" maxlength="40">
       </label>
       <label class="col-5">Teléfono
         <input type="text" name="refcom1_telefono" inputmode="tel">
       </label>
       <label class="col-7">Entidad
-        <input type="text" name="refcom2_entidad">
+        <input type="text" name="refcom2_entidad" maxlength="40">
       </label>
       <label class="col-5">Teléfono
         <input type="text" name="refcom2_telefono" inputmode="tel">
@@ -232,7 +232,7 @@
         <input type="text" name="refper1_celular" inputmode="tel" required>
       </label>
       <label class="col-3"><span>Vínculo<span class="required-mark">*</span></span>
-        <input type="text" name="refper1_vinculo" required>
+        <input type="text" name="refper1_vinculo" required maxlength="20">
       </label>
       <label class="col-5"><span>Nombres y Apellidos<span class="required-mark">*</span></span>
         <input type="text" name="refper2_nombre" required>
@@ -241,7 +241,7 @@
         <input type="text" name="refper2_celular" inputmode="tel" required>
       </label>
       <label class="col-3"><span>Vínculo<span class="required-mark">*</span></span>
-        <input type="text" name="refper2_vinculo" required>
+        <input type="text" name="refper2_vinculo" required maxlength="20">
       </label>
     </div>
   </section>
@@ -292,17 +292,17 @@
           <label><input type="radio" name="conlab_tipo_empleo" value="Jubilado"> Jubilado/a</label>
           <label><input type="radio" name="conlab_tipo_empleo" value="Otro"> Otro</label>
         </div>
-        <input type="text" name="conlab_tipo_empleo_otro" placeholder="Especificar..." class="conditional-input" data-show-when="conlab_tipo_empleo=Otro">
+        <input type="text" name="conlab_tipo_empleo_otro" placeholder="Especificar..." class="conditional-input" data-show-when="conlab_tipo_empleo=Otro" maxlength="30">
       </div>
 
       <label class="col-4">Cargo
-        <input type="text" name="conlab_cargo">
+        <input type="text" name="conlab_cargo" maxlength="40">
       </label>
       <label class="col-4">Monto de Ingreso
         <input type="text" name="conlab_monto_ingreso" inputmode="numeric" placeholder="Gs.">
       </label>
       <label class="col-4">Antigüedad
-        <input type="text" name="conlab_antiguedad">
+        <input type="text" name="conlab_antiguedad" maxlength="20">
       </label>
     </div>
   </section>
@@ -351,7 +351,7 @@
         <input type="text" name="card_interes_punitorio">
       </label>
       <label class="col-12">Gestión de Recupero de Crédito en Mora
-        <input type="text" name="card_gestion_recupero">
+        <input type="text" name="card_gestion_recupero" maxlength="100">
       </label>
     </div>
   </section>

@@ -24,6 +24,23 @@ async function generateFidelityPdf(dataset) {
 
   const get = (name) => (dataset[name] || "").toString().trim();
 
+  // Campos monetarios (Gs.) que se muestran con punto de miles en el PDF.
+  const MONEY_FIELDS = new Set([
+    "tit_monto_solicitado", "tit_monto_concedido", "lab_monto_ingreso",
+    "ing_sueldo", "ing_sueldo_conyuge", "ing_jubilacion", "ing_otros", "ing_total",
+    "egr_gastos_familiares", "egr_cuota_prestamos", "egr_alquiler", "egr_otros", "egr_total",
+    "conlab_monto_ingreso", "card_linea_credito", "card_costo_emision",
+    "card_costo_cuota_anual", "card_costo_renovacion", "seg_capital",
+  ]);
+  // Reformatea con punto de miles; idempotente aunque el valor ya venga
+  // formateado (p. ej. los totales, que ya llegan con puntos).
+  function formatMoneyValue(v) {
+    const digits = String(v).replace(/\D/g, "");
+    if (!digits) return v;
+    const n = parseInt(digits, 10);
+    return isNaN(n) ? v : n.toLocaleString("es-PY");
+  }
+
   // ---- helper: dibuja texto en una línea, reduciendo el tamaño si no entra ----
   function drawFitted(page, text, x, yTop, size, maxWidth, useFont, color) {
     if (!text) return;
@@ -41,6 +58,7 @@ async function generateFidelityPdf(dataset) {
   const OTROS_DETALLE_MAP = { ing_otros: "ing_otros_detalle", egr_otros: "egr_otros_detalle" };
   for (const f of TEXT_FIELDS) {
     let value = get(f.name);
+    if (MONEY_FIELDS.has(f.name) && value) value = formatMoneyValue(value);
     const detalleField = OTROS_DETALLE_MAP[f.name];
     if (detalleField) {
       const detalle = get(detalleField);
