@@ -65,16 +65,14 @@ function getConditionalRequiredFields() {
   return extra;
 }
 
-// Devuelve el nombre del primer campo obligatorio vacío, o null si está todo completo.
+// Devuelve los nombres de todos los campos obligatorios vacíos.
 // (No se usa validación nativa del navegador porque los pasos no activos
 // tienen display:none, y los campos ocultos quedan excluidos de esa validación.)
-function findFirstMissingRequiredField() {
-  for (const name of REQUIRED_FIELDS.concat(getConditionalRequiredFields())) {
+function findMissingRequiredFields() {
+  return REQUIRED_FIELDS.concat(getConditionalRequiredFields()).filter((name) => {
     const el = form.elements[name];
-    if (!el) continue;
-    if (!(el.value || "").toString().trim()) return name;
-  }
-  return null;
+    return !el || !(el.value || "").toString().trim();
+  });
 }
 
 function goToFieldStep(name) {
@@ -84,6 +82,35 @@ function goToFieldStep(name) {
   const index = Array.from(panels).indexOf(panel);
   if (index !== -1) showStep(index);
   el.focus();
+}
+
+// ---------- Marcado en rojo de campos obligatorios faltantes ----------
+// Para un grupo de radios, el borde rojo se aplica al contenedor
+// ".radio-row" (los <input type="radio"> individuales no tienen borde propio).
+function getFieldErrorTarget(name) {
+  const el = form.querySelector(`[name="${name}"]`);
+  if (!el) return null;
+  if (el.type === "radio") {
+    const wrapper = el.closest(".field-radio");
+    return (wrapper && wrapper.querySelector(".radio-row")) || el;
+  }
+  return el;
+}
+
+function setFieldError(name, hasError) {
+  const target = getFieldErrorTarget(name);
+  if (target) target.classList.toggle("field-error", hasError);
+}
+
+// Limpia la marca de error de un campo apenas se completa, sin esperar
+// a un nuevo intento de envío.
+form.addEventListener("input", clearFieldErrorIfFilled);
+form.addEventListener("change", clearFieldErrorIfFilled);
+function clearFieldErrorIfFilled(e) {
+  const name = e.target.name;
+  if (!name) return;
+  const el = form.elements[name];
+  if (el && (el.value || "").toString().trim()) setFieldError(name, false);
 }
 
 // ---------- Autocálculo de Ingresos / Egresos ----------
@@ -167,15 +194,20 @@ async function sendRecord() {
 
 // ---------- Aceptación de términos ----------
 const termsCheckbox = document.getElementById("terms-accept");
+termsCheckbox.addEventListener("change", () => {
+  if (termsCheckbox.checked) termsCheckbox.classList.remove("field-error");
+});
 
 btnSend.addEventListener("click", async () => {
-  const missing = findFirstMissingRequiredField();
-  if (missing) {
-    goToFieldStep(missing);
-    setSendMsg(`Falta completar el campo obligatorio "${FIELD_LABELS[missing] || missing}".`, "error");
+  const missing = findMissingRequiredFields();
+  missing.forEach((name) => setFieldError(name, true));
+  if (missing.length) {
+    goToFieldStep(missing[0]);
+    setSendMsg(`Falta completar el campo obligatorio "${FIELD_LABELS[missing[0]] || missing[0]}".`, "error");
     return;
   }
   if (!termsCheckbox.checked) {
+    termsCheckbox.classList.add("field-error");
     showStep(lastStepIndex);
     termsCheckbox.focus();
     setSendMsg("Falta aceptar la declaración jurada y autorización para poder enviar.", "error");

@@ -10,7 +10,7 @@ App web (sin backend propio) para completar el **Formulario Único de Identifica
    - Con la extensión "Live Server" de VS Code.
    - En producción: desplegado en Vercel (sitio estático, sin configuración especial).
 2. Completá los datos en las distintas pestañas (Datos del Titular, Domicilio y Laboral, Ingresos/Egresos, Referencias, Cónyuge/Adicional, Registro de Firmas, Datos de Tarjeta, Seguro Crediticio).
-3. **"Enviar registro a la planilla"** guarda los datos en la planilla de Google Sheets (queda con estado "Pendiente").
+3. **"Enviar solicitud"** guarda los datos en la planilla de Google Sheets (queda con estado "Pendiente").
 4. Entrá a `gestor.html` (Panel de gestión), abrí el detalle de la solicitud y desde ahí:
    - **"Descargar PDF"** genera y descarga un PDF idéntico al formulario original, con los campos llenados y las opciones (Sexo, Estado Civil, Vivienda, Tipo de empleo) marcadas con una X — usando los datos ya guardados en la planilla.
    - **"Aprobar"** / **"Rechazar"** cambian el estado de la solicitud.
@@ -101,4 +101,4 @@ Las variables de color están centralizadas en `styles.css` (`:root`), así que 
 
 ## Privacidad
 
-El PDF se genera 100% en el navegador (a partir de los datos guardados en la planilla). Los datos del formulario solo se envían a la planilla de Google Sheets cuando hacés clic en "Enviar registro a la planilla" — nunca a ningún otro servidor.
+El PDF se genera 100% en el navegador (a partir de los datos guardados en la planilla). Los datos del formulario solo se envían a la planilla de Google Sheets cuando hacés clic en "Enviar solicitud" — nunca a ningún otro servidor.

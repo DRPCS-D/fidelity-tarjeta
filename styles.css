@@ -183,6 +183,16 @@ body {
 
 .field-label { font-size: 0.82rem; }
 .required-mark { color: var(--danger); margin-left: 2px; }
+
+.field-error {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px rgba(179, 38, 30, 0.12);
+}
+.terms-check input[type="checkbox"].field-error {
+  outline: 2px solid var(--danger);
+  outline-offset: 2px;
+  box-shadow: none;
+}
 .radio-row {
   display: flex;
   gap: 14px;
