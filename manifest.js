@@ -4,6 +4,23 @@
 // (orden de columnas) como para mostrarlos en el panel de gestión.
 // ============================================================
 
+// Emojis y símbolos pictográficos: no tienen sentido en los datos de una
+// solicitud de tarjeta y, además, la fuente del PDF no puede dibujarlos
+// (rompía la generación completa si se colaba uno). Se bloquean al tipear
+// en vez de solo filtrarlos al generar el PDF.
+const BLOCKED_CHARS_REGEX = /[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}]/gu;
+
+function stripBlockedChars(el) {
+  const original = el.value;
+  const cleaned = original.replace(BLOCKED_CHARS_REGEX, "");
+  if (cleaned === original) return;
+  const caret = el.selectionStart == null ? cleaned.length : el.selectionStart;
+  const removedBefore = original.slice(0, caret).length - original.slice(0, caret).replace(BLOCKED_CHARS_REGEX, "").length;
+  el.value = cleaned;
+  const newCaret = Math.max(0, caret - removedBefore);
+  try { el.setSelectionRange(newCaret, newCaret); } catch (err) { /* algunos inputs (p. ej. email) no soportan setSelectionRange */ }
+}
+
 const ALL_FIELD_NAMES = [
   // Titular
   "tit_nombre", "tit_fecha_solicitud", "tit_ci", "tit_monto_solicitado", "tit_monto_concedido",

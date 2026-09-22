@@ -272,6 +272,12 @@ const detailTitle = document.getElementById("detail-title");
 const footerView = document.getElementById("detail-footer-view");
 const footerEdit = document.getElementById("detail-footer-edit");
 
+// Bloqueo de emojis / símbolos no soportados al editar un campo.
+detailBody.addEventListener("input", (e) => {
+  const el = e.target;
+  if (el.classList.contains("detail-input") && el.tagName === "INPUT") stripBlockedChars(el);
+});
+
 let editMode = false;
 let activeDetailTabIndex = 0;
 

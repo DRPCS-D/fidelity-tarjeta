@@ -41,8 +41,25 @@ async function generateFidelityPdf(dataset) {
     return isNaN(n) ? v : n.toLocaleString("es-PY");
   }
 
+  // Quita caracteres que la fuente no puede codificar (p. ej. emojis
+  // pegados sin querer en un campo de texto), en vez de dejar que
+  // drawText tire abajo la generación completa del PDF.
+  function sanitizeForFont(text, useFont) {
+    let out = "";
+    for (const ch of text) {
+      try {
+        useFont.widthOfTextAtSize(ch, 8);
+        out += ch;
+      } catch (err) {
+        // se omite el carácter no soportado
+      }
+    }
+    return out;
+  }
+
   // ---- helper: dibuja texto en una línea, reduciendo el tamaño si no entra ----
   function drawFitted(page, text, x, yTop, size, maxWidth, useFont, color) {
+    text = sanitizeForFont(String(text || ""), useFont);
     if (!text) return;
     let fontSize = size;
     const minSize = 5;

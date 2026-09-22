@@ -45,6 +45,12 @@ form.addEventListener("change", (e) => {
 });
 refreshConditionalInputs();
 
+// ---------- Bloqueo de emojis / símbolos no soportados ----------
+form.addEventListener("input", (e) => {
+  const el = e.target;
+  if (el.tagName === "INPUT" && ["text", "email", "tel"].includes(el.type)) stripBlockedChars(el);
+});
+
 // ---------- Validación de campos obligatorios (marcados con "*") ----------
 const REQUIRED_FIELDS = [
   "tit_nombre", "tit_ci", "tit_monto_solicitado", "tit_nacionalidad", "tit_sexo",
