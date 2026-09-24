@@ -135,7 +135,7 @@ body {
   margin-bottom: 12px;
 }
 .location-map {
-  height: 280px;
+  height: 450px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   margin-bottom: 18px;
