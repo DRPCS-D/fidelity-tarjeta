@@ -86,6 +86,9 @@ function placeMarker(lat, lng) {
 function initDomMap() {
   if (domMap) return;
   domMap = L.map("dom-map").setView([DEFAULT_LOCATION.lat, DEFAULT_LOCATION.lng], 13);
+  // Se saca el prefijo "Leaflet" (no es obligatorio); la atribución a
+  // OpenStreetMap sí es requisito de su licencia y se mantiene.
+  domMap.attributionControl.setPrefix(false);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "&copy; OpenStreetMap contributors",
     maxZoom: 19,
