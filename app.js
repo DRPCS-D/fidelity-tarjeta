@@ -216,14 +216,22 @@ function setFieldError(name, hasError) {
 }
 
 // Limpia la marca de error de un campo apenas se completa, sin esperar
-// a un nuevo intento de envío.
+// a un nuevo intento de envío. También limpia el mensaje de "Falta
+// completar..." si era justo ese campo el que faltaba.
+let lastMissingFieldName = null;
 form.addEventListener("input", clearFieldErrorIfFilled);
 form.addEventListener("change", clearFieldErrorIfFilled);
 function clearFieldErrorIfFilled(e) {
   const name = e.target.name;
   if (!name) return;
   const el = form.elements[name];
-  if (el && (el.value || "").toString().trim()) setFieldError(name, false);
+  if (el && (el.value || "").toString().trim()) {
+    setFieldError(name, false);
+    if (name === lastMissingFieldName) {
+      lastMissingFieldName = null;
+      setSendMsg("", "");
+    }
+  }
 }
 
 // ---------- Autocálculo de Ingresos / Egresos ----------
@@ -308,7 +316,13 @@ async function sendRecord() {
 // ---------- Aceptación de términos ----------
 const termsCheckbox = document.getElementById("terms-accept");
 termsCheckbox.addEventListener("change", () => {
-  if (termsCheckbox.checked) termsCheckbox.classList.remove("field-error");
+  if (termsCheckbox.checked) {
+    termsCheckbox.classList.remove("field-error");
+    if (lastMissingFieldName === "terms-accept") {
+      lastMissingFieldName = null;
+      setSendMsg("", "");
+    }
+  }
 });
 
 btnSend.addEventListener("click", async () => {
@@ -316,6 +330,7 @@ btnSend.addEventListener("click", async () => {
   missing.forEach((name) => setFieldError(name, true));
   if (missing.length) {
     goToFieldStep(missing[0]);
+    lastMissingFieldName = missing[0];
     setSendMsg(`Falta completar el campo obligatorio "${FIELD_LABELS[missing[0]] || missing[0]}".`, "error");
     return;
   }
@@ -323,9 +338,11 @@ btnSend.addEventListener("click", async () => {
     termsCheckbox.classList.add("field-error");
     showStep(lastStepIndex);
     termsCheckbox.focus();
+    lastMissingFieldName = "terms-accept";
     setSendMsg("Falta aceptar la declaración jurada y autorización para poder enviar.", "error");
     return;
   }
+  lastMissingFieldName = null;
   btnSend.disabled = true;
   setSendMsg("Enviando registro…", "");
   try {
