@@ -65,6 +65,16 @@ const ALL_COLUMNS = FIXED_COLUMNS.concat(FIELD_NAMES);
 // guardadas como fecha (filas viejas, o edición manual en la planilla).
 const DATE_COLUMNS = ["tit_fecha_solicitud", "tit_fecha_nac", "con_fecha_nac", "seg_emision", "seg_vigencia_desde", "seg_vigencia_hasta"];
 
+// Coordenadas GPS del domicilio: llegan como texto "-25.521375" (siempre
+// con 6 decimales, ver toFixed(6) en app.js). Sheets las auto-convierte a
+// número y les saca el punto (quedaría "-25521375"), igual que pasaba con
+// las fechas. Se fuerza texto antes de escribir, por la misma razón.
+const GPS_COLUMNS = ["dom_gps_lat", "dom_gps_lng"];
+
+// Columnas que hay que forzar a formato texto ANTES de escribir para que
+// Sheets no las reinterprete como fecha o número.
+const FORCE_TEXT_COLUMNS = DATE_COLUMNS.concat(GPS_COLUMNS);
+
 function getSheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName(SHEET_NAME);
@@ -140,6 +150,14 @@ function doGet(e) {
     return handleSyncColumns_();
   }
 
+  // Acción de mantenimiento: corrige filas ya guardadas donde una
+  // coordenada GPS quedó guardada como número sin el punto decimal
+  // (p. ej. "-25521375" en vez de "-25.521375"). Se puede llamar una
+  // sola vez después de actualizar este script.
+  if (action === "repairGps") {
+    return handleRepairGps_();
+  }
+
   return jsonResponse_({ ok: false, error: "Acción desconocida: " + action });
 }
 
@@ -188,10 +206,10 @@ function handleCreate_(body) {
 
   const rowIndex = sheet.getLastRow() + 1;
 
-  // Forzar formato de texto en las columnas de fecha ANTES de escribir el
-  // valor, para que Sheets no las convierta automáticamente en un valor
-  // de fecha real (eso rompería el "dd/mm/aaaa" que espera el PDF).
-  DATE_COLUMNS.forEach((colName) => {
+  // Forzar formato de texto en las columnas de fecha/GPS ANTES de escribir
+  // el valor, para que Sheets no las convierta automáticamente en un
+  // valor de fecha real o en número (le sacaría el punto decimal).
+  FORCE_TEXT_COLUMNS.forEach((colName) => {
     const colIndex = ALL_COLUMNS.indexOf(colName);
     if (colIndex !== -1) {
       sheet.getRange(rowIndex, colIndex + 1).setNumberFormat("@");
@@ -249,7 +267,7 @@ function handleUpdateRecord_(body) {
         if (FIXED_COLUMNS.indexOf(colName) !== -1) return;
         const colIndex = headers.indexOf(colName);
         if (colIndex === -1) return;
-        if (DATE_COLUMNS.indexOf(colName) !== -1) {
+        if (FORCE_TEXT_COLUMNS.indexOf(colName) !== -1) {
           sheet.getRange(rowIndex, colIndex + 1).setNumberFormat("@");
         }
         sheet.getRange(rowIndex, colIndex + 1).setValue(data[colName]);
@@ -282,9 +300,9 @@ function handleBulkImport_(body) {
     });
   });
 
-  // Igual que en handleCreate_: forzar texto en las columnas de fecha
-  // ANTES de escribir, para que Sheets no las convierta en fechas reales.
-  DATE_COLUMNS.forEach((colName) => {
+  // Igual que en handleCreate_: forzar texto en las columnas de fecha/GPS
+  // ANTES de escribir, para que Sheets no las reinterprete.
+  FORCE_TEXT_COLUMNS.forEach((colName) => {
     const colIndex = ALL_COLUMNS.indexOf(colName);
     if (colIndex !== -1) {
       sheet.getRange(startRow, colIndex + 1, matrix.length, 1).setNumberFormat("@");
@@ -304,6 +322,43 @@ function handleSyncColumns_() {
     sheet.getRange(1, lastCol + 1, 1, missing.length).setValues([missing]);
   }
   return jsonResponse_({ ok: true, added: missing });
+}
+
+// Reconstruye el punto decimal: el cliente siempre escribe las
+// coordenadas con toFixed(6) (6 decimales exactos), así que si una celda
+// quedó como un entero sin punto, el punto va exactamente 6 dígitos antes
+// del final.
+function handleRepairGps_() {
+  const sheet = getSheet_();
+  const values = sheet.getDataRange().getValues();
+  const headers = values[0];
+  let fixed = 0;
+
+  GPS_COLUMNS.forEach((colName) => {
+    const colIndex = headers.indexOf(colName);
+    if (colIndex === -1) return;
+    const numRows = values.length - 1;
+    if (numRows <= 0) return;
+
+    sheet.getRange(2, colIndex + 1, numRows, 1).setNumberFormat("@");
+
+    for (let r = 1; r < values.length; r++) {
+      const cell = values[r][colIndex];
+      if (cell === "" || cell === null || cell === undefined) continue;
+      const str = String(cell);
+      if (str.indexOf(".") !== -1) continue; // ya tiene el punto, está bien
+      const negative = str.charAt(0) === "-";
+      const digits = negative ? str.slice(1) : str;
+      if (!/^\d+$/.test(digits) || digits.length <= 6) continue;
+      const intPart = digits.slice(0, digits.length - 6);
+      const decPart = digits.slice(digits.length - 6);
+      const repaired = (negative ? "-" : "") + intPart + "." + decPart;
+      sheet.getRange(r + 1, colIndex + 1).setValue(repaired);
+      fixed++;
+    }
+  });
+
+  return jsonResponse_({ ok: true, fixed: fixed });
 }
 
 function handleRepairDates_() {
