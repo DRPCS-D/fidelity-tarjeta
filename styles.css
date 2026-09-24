@@ -127,6 +127,22 @@ body {
   margin: -8px 0 18px;
 }
 
+.location-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.location-map {
+  height: 280px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 18px;
+  background: #eef1f5;
+}
+.location-map .leaflet-container { border-radius: var(--radius); }
+
 .grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);

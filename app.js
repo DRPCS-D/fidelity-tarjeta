@@ -22,6 +22,12 @@ function showStep(index) {
   btnNext.hidden = currentStep === lastStepIndex;
   btnSend.hidden = currentStep !== lastStepIndex;
   window.scrollTo({ top: 0, behavior: "smooth" });
+  if (panels[currentStep].dataset.panel === "domicilio") {
+    initDomMap();
+    // El mapa se mide mal si se crea/actualiza mientras su contenedor
+    // estaba con display:none (el paso anterior a activarse).
+    setTimeout(() => domMap && domMap.invalidateSize(), 0);
+  }
 }
 
 tabButtons.forEach((btn, i) => {
@@ -44,6 +50,90 @@ form.addEventListener("change", (e) => {
   if (e.target.type === "radio") refreshConditionalInputs();
 });
 refreshConditionalInputs();
+
+// ---------- Ubicación GPS (mapa opcional en Domicilio Particular) ----------
+// Arregla las rutas de los íconos por defecto de Leaflet, que se rompen
+// al cargar la librería desde un CDN en vez de instalarla localmente.
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+});
+
+const DEFAULT_LOCATION = { lat: -25.5097, lng: -54.6111 }; // Ciudad del Este, Paraguay
+const locationStatus = document.getElementById("location-status");
+const btnClearLocation = document.getElementById("btn-clear-location");
+let domMap = null;
+let domMarker = null;
+
+function setLocationStatus(msg, type) {
+  locationStatus.textContent = msg;
+  locationStatus.className = "status-msg" + (type ? " " + type : "");
+}
+
+function placeMarker(lat, lng) {
+  if (domMarker) {
+    domMarker.setLatLng([lat, lng]);
+  } else {
+    domMarker = L.marker([lat, lng]).addTo(domMap);
+  }
+  form.elements["dom_gps_lat"].value = lat.toFixed(6);
+  form.elements["dom_gps_lng"].value = lng.toFixed(6);
+  btnClearLocation.hidden = false;
+}
+
+function initDomMap() {
+  if (domMap) return;
+  domMap = L.map("dom-map").setView([DEFAULT_LOCATION.lat, DEFAULT_LOCATION.lng], 13);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap contributors",
+    maxZoom: 19,
+  }).addTo(domMap);
+  domMap.on("click", (e) => {
+    placeMarker(e.latlng.lat, e.latlng.lng);
+    setLocationStatus("Ubicación marcada manualmente.", "ok");
+  });
+  // Si el formulario ya traía coordenadas cargadas (p. ej. al reabrir un
+  // borrador), se muestra el marcador correspondiente.
+  const savedLat = parseFloat(form.elements["dom_gps_lat"].value);
+  const savedLng = parseFloat(form.elements["dom_gps_lng"].value);
+  if (!isNaN(savedLat) && !isNaN(savedLng)) {
+    domMap.setView([savedLat, savedLng], 16);
+    placeMarker(savedLat, savedLng);
+  }
+}
+
+document.getElementById("btn-use-gps").addEventListener("click", () => {
+  if (!navigator.geolocation) {
+    setLocationStatus("Tu navegador no soporta geolocalización. Marcá el punto manualmente en el mapa.", "error");
+    return;
+  }
+  setLocationStatus("Obteniendo tu ubicación…", "");
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const { latitude, longitude } = pos.coords;
+      domMap.setView([latitude, longitude], 16);
+      placeMarker(latitude, longitude);
+      setLocationStatus("Ubicación obtenida correctamente.", "ok");
+    },
+    (err) => {
+      setLocationStatus(`No se pudo obtener tu ubicación (${err.message}). Marcá el punto manualmente en el mapa.`, "error");
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+});
+
+btnClearLocation.addEventListener("click", () => {
+  if (domMarker) {
+    domMap.removeLayer(domMarker);
+    domMarker = null;
+  }
+  form.elements["dom_gps_lat"].value = "";
+  form.elements["dom_gps_lng"].value = "";
+  btnClearLocation.hidden = true;
+  setLocationStatus("", "");
+});
 
 // ---------- Bloqueo de emojis / símbolos no soportados ----------
 form.addEventListener("input", (e) => {

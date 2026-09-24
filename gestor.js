@@ -311,8 +311,14 @@ function renderDetailBody(record) {
       html += group.fields.map((f) => `<label class="detail-edit-row">${FIELD_LABELS[f] || f}${buildFieldInput(f, record[f])}</label>`).join("");
     } else {
       const rowsHtml = group.fields
-        .filter((f) => record[f] !== undefined && record[f] !== "")
+        .filter((f) => f !== "dom_gps_lng" && record[f] !== undefined && record[f] !== "")
         .map((f) => {
+          // La latitud/longitud se muestran juntas como un único link a Google Maps.
+          if (f === "dom_gps_lat") {
+            if (!record.dom_gps_lng) return "";
+            const mapsUrl = `https://www.google.com/maps?q=${encodeURIComponent(record.dom_gps_lat)},${encodeURIComponent(record.dom_gps_lng)}`;
+            return `<div class="detail-row"><span class="detail-label">Ubicación GPS</span><span class="detail-value"><a href="${mapsUrl}" target="_blank" rel="noopener">Ver en Google Maps</a></span></div>`;
+          }
           const value = MONEY_FIELDS.has(f) ? formatMoney(record[f]) : record[f];
           return `<div class="detail-row"><span class="detail-label">${FIELD_LABELS[f] || f}</span><span class="detail-value">${escapeHtml(value)}</span></div>`;
         })

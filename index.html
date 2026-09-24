@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Formulario Fidelity Card</title>
 <link rel="icon" href="assets/favicon.ico">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -29,9 +30,9 @@
   <button class="tab-btn" data-tab="domicilio">Domicilio y Laboral</button>
   <button class="tab-btn" data-tab="finanzas">Ingresos / Egresos</button>
   <button class="tab-btn" data-tab="referencias">Referencias</button>
-  <button class="tab-btn" data-tab="conyuge">Cónyuge / Adicional</button>
+  <button class="tab-btn" data-tab="conyuge" hidden>Cónyuge / Adicional</button>
   <button class="tab-btn" data-tab="firmas" hidden>Registro de Firmas</button>
-  <button class="tab-btn" data-tab="tarjeta">Datos de Tarjeta</button>
+  <button class="tab-btn" data-tab="tarjeta" hidden>Datos de Tarjeta</button>
   <button class="tab-btn" data-tab="seguro">Seguro Crediticio</button>
 </nav>
 
@@ -121,6 +122,17 @@
         <input type="text" name="dom_obs" maxlength="60">
       </label>
     </div>
+
+    <h2>Ubicación (opcional)</h2>
+    <p class="hint">Podés usar tu ubicación GPS o marcar el punto manualmente en el mapa (por ejemplo, si estás completando la solicitud fuera de tu domicilio).</p>
+    <div class="location-actions">
+      <button type="button" id="btn-use-gps" class="btn secondary">Usar mi ubicación GPS</button>
+      <button type="button" id="btn-clear-location" class="btn secondary" hidden>Borrar ubicación</button>
+      <span id="location-status" class="status-msg"></span>
+    </div>
+    <div id="dom-map" class="location-map"></div>
+    <input type="hidden" name="dom_gps_lat">
+    <input type="hidden" name="dom_gps_lng">
 
     <h2>Datos Laborales</h2>
     <div class="grid">
@@ -247,7 +259,7 @@
   </section>
 
   <!-- ============ CÓNYUGE / ADICIONAL ============ -->
-  <section class="tab-panel" data-panel="conyuge">
+  <section class="tab-panel" data-panel="conyuge" hidden>
     <h2>Datos Personales del: Cónyuge / Adicional</h2>
     <div class="grid">
       <label class="col-12">Nombres y Apellidos
@@ -322,7 +334,7 @@
   </section>
 
   <!-- ============ TARJETA ============ -->
-  <section class="tab-panel" data-panel="tarjeta">
+  <section class="tab-panel" data-panel="tarjeta" hidden>
     <h2>Condiciones Generales — Datos de la Tarjeta</h2>
     <p class="hint">El texto de las condiciones generales no se modifica. Los espacios de firma quedan en blanco.</p>
     <div class="grid">
@@ -418,6 +430,7 @@
   <p>Tus datos personales son tratados de forma confidencial y se utilizan exclusivamente para evaluar esta solicitud de tarjeta Fidelity Card, conforme a nuestra Política de Privacidad.</p>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="config.js"></script>
 <script src="manifest.js"></script>
 <script src="app.js"></script>

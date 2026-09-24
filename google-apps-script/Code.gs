@@ -50,7 +50,7 @@ const FIELD_NAMES = [
   "card_interes_punitorio", "card_gestion_recupero",
   "seg_sucursal", "seg_poliza", "seg_asegurado", "seg_documento", "seg_domicilio", "seg_localidad",
   "seg_emision", "seg_vigencia_desde", "seg_vigencia_hasta", "seg_plazo", "seg_capital",
-  "egr_otros_detalle", "ing_otros_detalle",
+  "egr_otros_detalle", "ing_otros_detalle", "dom_gps_lat", "dom_gps_lng",
 ];
 
 // Columnas fijas al principio de la planilla.
