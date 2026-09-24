@@ -51,7 +51,7 @@ form.addEventListener("change", (e) => {
 });
 refreshConditionalInputs();
 
-// ---------- Ubicación GPS (mapa opcional en Domicilio Particular) ----------
+// ---------- Ubicación (mapa en Domicilio Particular, marcado manual) ----------
 // Arregla las rutas de los íconos por defecto de Leaflet, que se rompen
 // al cargar la librería desde un CDN en vez de instalarla localmente.
 delete L.Icon.Default.prototype._getIconUrl;
@@ -103,26 +103,6 @@ function initDomMap() {
     placeMarker(savedLat, savedLng);
   }
 }
-
-document.getElementById("btn-use-gps").addEventListener("click", () => {
-  if (!navigator.geolocation) {
-    setLocationStatus("Tu navegador no soporta geolocalización. Marcá el punto manualmente en el mapa.", "error");
-    return;
-  }
-  setLocationStatus("Obteniendo tu ubicación…", "");
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      const { latitude, longitude } = pos.coords;
-      domMap.setView([latitude, longitude], 16);
-      placeMarker(latitude, longitude);
-      setLocationStatus("Ubicación obtenida correctamente.", "ok");
-    },
-    (err) => {
-      setLocationStatus(`No se pudo obtener tu ubicación (${err.message}). Marcá el punto manualmente en el mapa.`, "error");
-    },
-    { enableHighAccuracy: true, timeout: 10000 }
-  );
-});
 
 btnClearLocation.addEventListener("click", () => {
   if (domMarker) {
