@@ -67,6 +67,20 @@ const btnClearLocation = document.getElementById("btn-clear-location");
 let domMap = null;
 let domMarker = null;
 
+// Sucursales de Patachoca: se muestran como referencia en el mapa.
+const STORE_LOCATIONS = [
+  { name: "Patachoca Km 4", lat: -25.5086347, lng: -54.6395336 },
+  { name: "Patachoca Km 7", lat: -25.4984198, lng: -54.6663991 },
+  { name: "Patachoca Casa Matriz", lat: -25.5110255, lng: -54.6124353 },
+];
+const storeIcon = L.divIcon({
+  className: "store-marker",
+  html: `<div class="store-marker-pin"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v10a1 1 0 0 0 1 1h3v-6h8v6h3a1 1 0 0 0 1-1V9"/><path d="M4 9h16"/></svg></div>`,
+  iconSize: [26, 26],
+  iconAnchor: [13, 13],
+  popupAnchor: [0, -13],
+});
+
 function setLocationStatus(msg, type) {
   locationStatus.textContent = msg;
   locationStatus.className = "status-msg" + (type ? " " + type : "");
@@ -93,18 +107,38 @@ function initDomMap() {
     attribution: "&copy; OpenStreetMap contributors",
     maxZoom: 19,
   }).addTo(domMap);
+
+  const storeMarkers = STORE_LOCATIONS.map((store) => {
+    const mapsUrl = `https://www.google.com/maps?q=${store.lat},${store.lng}`;
+    return L.marker([store.lat, store.lng], { icon: storeIcon, keyboard: false })
+      .bindPopup(`<strong>${store.name}</strong><br><a href="${mapsUrl}" target="_blank" rel="noopener">Ver en Google Maps</a>`)
+      .addTo(domMap);
+  });
+
   domMap.on("click", (e) => {
     placeMarker(e.latlng.lat, e.latlng.lng);
     setLocationStatus("Ubicación marcada manualmente.", "ok");
   });
-  // Si el formulario ya traía coordenadas cargadas (p. ej. al reabrir un
-  // borrador), se muestra el marcador correspondiente.
-  const savedLat = parseFloat(form.elements["dom_gps_lat"].value);
-  const savedLng = parseFloat(form.elements["dom_gps_lng"].value);
-  if (!isNaN(savedLat) && !isNaN(savedLng)) {
-    domMap.setView([savedLat, savedLng], 16);
-    placeMarker(savedLat, savedLng);
-  }
+
+  // El contenedor recién pasa de display:none a visible en este mismo
+  // instante (el paso anterior lo tenía oculto), así que Leaflet todavía
+  // no puede medirlo bien de forma sincrónica: se difiere al siguiente
+  // tick, si no el encuadre inicial sale con un zoom absurdo (todo el
+  // mundo, en vez de la zona de las sucursales).
+  setTimeout(() => {
+    domMap.invalidateSize();
+    // Si el formulario ya traía coordenadas cargadas (p. ej. al reabrir un
+    // borrador), se muestra el marcador correspondiente. Si no, se
+    // encuadra la vista para que se vean las sucursales de referencia.
+    const savedLat = parseFloat(form.elements["dom_gps_lat"].value);
+    const savedLng = parseFloat(form.elements["dom_gps_lng"].value);
+    if (!isNaN(savedLat) && !isNaN(savedLng)) {
+      domMap.setView([savedLat, savedLng], 16);
+      placeMarker(savedLat, savedLng);
+    } else {
+      domMap.fitBounds(L.featureGroup(storeMarkers).getBounds().pad(0.4));
+    }
+  }, 0);
 }
 
 btnClearLocation.addEventListener("click", () => {
