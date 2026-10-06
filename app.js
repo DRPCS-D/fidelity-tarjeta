@@ -72,6 +72,10 @@ const STORE_LOCATIONS = [
   { name: "Patachoca Km 4", lat: -25.5086347, lng: -54.6395336 },
   { name: "Patachoca Km 7", lat: -25.4984198, lng: -54.6663991 },
   { name: "Patachoca Casa Matriz", lat: -25.5110255, lng: -54.6124353 },
+  { name: "Patachoca Multiplaza", lat: -25.3165696, lng: -57.5712924 },
+  { name: "Patachoca San Lorenzo", lat: -25.343038, lng: -57.488346 },
+  { name: "Patachoca Luque", lat: -25.2681085, lng: -57.4891005 },
+  { name: "Patachoca Limpio", lat: -25.1753575, lng: -57.4855344 },
 ];
 const storeIcon = L.divIcon({
   className: "store-marker",
