@@ -6,15 +6,20 @@
 const form = document.getElementById("fidelity-form");
 
 // ---------- Navegación por tabs / pasos ----------
-const tabButtons = document.querySelectorAll(".tab-btn:not([hidden])");
-const panels = document.querySelectorAll(".tab-panel:not([hidden])");
+// Las listas se calculan en cada uso porque el paso "Ingresos / Egresos"
+// aparece u oculta según el tipo de empleo.
+const getTabButtons = () => Array.from(document.querySelectorAll(".tab-btn:not([hidden])"));
+const getPanels = () => Array.from(document.querySelectorAll(".tab-panel:not([hidden])"));
 const btnPrev = document.getElementById("btn-prev");
 const btnNext = document.getElementById("btn-next");
 const btnSend = document.getElementById("btn-send");
-const lastStepIndex = panels.length - 1;
+const getLastStepIndex = () => getPanels().length - 1;
 let currentStep = 0;
 
 function showStep(index) {
+  const tabButtons = getTabButtons();
+  const panels = getPanels();
+  const lastStepIndex = panels.length - 1;
   currentStep = Math.max(0, Math.min(index, lastStepIndex));
   tabButtons.forEach((b, i) => b.classList.toggle("active", i === currentStep));
   panels.forEach((p, i) => p.classList.toggle("active", i === currentStep));
@@ -22,19 +27,38 @@ function showStep(index) {
   btnNext.hidden = currentStep === lastStepIndex;
   btnSend.hidden = currentStep !== lastStepIndex;
   window.scrollTo({ top: 0, behavior: "smooth" });
-  if (panels[currentStep].dataset.panel === "domicilio") {
-    initDomMap();
-    // El mapa se mide mal si se crea/actualiza mientras su contenedor
-    // estaba con display:none (el paso anterior a activarse).
-    setTimeout(() => domMap && domMap.invalidateSize(), 0);
-  }
 }
 
-tabButtons.forEach((btn, i) => {
-  btn.addEventListener("click", () => showStep(i));
+document.querySelector(".tabs").addEventListener("click", (e) => {
+  const btn = e.target.closest(".tab-btn");
+  if (btn) showStep(getTabButtons().indexOf(btn));
 });
 btnPrev.addEventListener("click", () => showStep(currentStep - 1));
 btnNext.addEventListener("click", () => showStep(currentStep + 1));
+
+// ---------- "Ingresos / Egresos" solo para Empleado/a y Comerciante ----------
+const FINANCE_EMPLOYMENT_TYPES = ["Empleado", "Comerciante"];
+const financeTabBtn = document.querySelector('.tab-btn[data-tab="finanzas"]');
+const financePanel = document.querySelector('.tab-panel[data-panel="finanzas"]');
+function financeEnabled() {
+  return FINANCE_EMPLOYMENT_TYPES.includes(form.elements["lab_tipo_empleo"].value);
+}
+function refreshFinanceStep() {
+  const enabled = financeEnabled();
+  financeTabBtn.hidden = !enabled;
+  financePanel.hidden = !enabled;
+  if (!enabled) {
+    // Se descartan los montos cargados, así no viajan datos de un paso inhabilitado.
+    financePanel.querySelectorAll("input").forEach((el) => { el.value = ""; });
+    financePanel.querySelectorAll(".field-error").forEach((el) => el.classList.remove("field-error"));
+  }
+  const activeIdx = getPanels().findIndex((p) => p.classList.contains("active"));
+  if (activeIdx !== -1) showStep(activeIdx);
+}
+form.addEventListener("change", (e) => {
+  if (e.target.name === "lab_tipo_empleo") refreshFinanceStep();
+});
+refreshFinanceStep();
 
 // ---------- Campos condicionales ("Otra/Otro: Especificar") ----------
 function refreshConditionalInputs() {
@@ -51,111 +75,6 @@ form.addEventListener("change", (e) => {
 });
 refreshConditionalInputs();
 
-// ---------- Ubicación (mapa en Domicilio Particular, marcado manual) ----------
-// Arregla las rutas de los íconos por defecto de Leaflet, que se rompen
-// al cargar la librería desde un CDN en vez de instalarla localmente.
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-});
-
-const DEFAULT_LOCATION = { lat: -25.5097, lng: -54.6111 }; // Ciudad del Este, Paraguay
-const locationStatus = document.getElementById("location-status");
-const btnClearLocation = document.getElementById("btn-clear-location");
-let domMap = null;
-let domMarker = null;
-
-// Sucursales de Patachoca: se muestran como referencia en el mapa.
-const STORE_LOCATIONS = [
-  { name: "Patachoca Km 4", lat: -25.5086347, lng: -54.6395336 },
-  { name: "Patachoca Km 7", lat: -25.4984198, lng: -54.6663991 },
-  { name: "Patachoca Casa Matriz", lat: -25.5110255, lng: -54.6124353 },
-  { name: "Patachoca Multiplaza", lat: -25.3165696, lng: -57.5712924 },
-  { name: "Patachoca San Lorenzo", lat: -25.343038, lng: -57.488346 },
-  { name: "Patachoca Luque", lat: -25.2681085, lng: -57.4891005 },
-  { name: "Patachoca Limpio", lat: -25.1753575, lng: -57.4855344 },
-];
-const storeIcon = L.divIcon({
-  className: "store-marker",
-  html: `<div class="store-marker-pin"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v10a1 1 0 0 0 1 1h3v-6h8v6h3a1 1 0 0 0 1-1V9"/><path d="M4 9h16"/></svg></div>`,
-  iconSize: [26, 26],
-  iconAnchor: [13, 13],
-  popupAnchor: [0, -13],
-});
-
-function setLocationStatus(msg, type) {
-  locationStatus.textContent = msg;
-  locationStatus.className = "status-msg" + (type ? " " + type : "");
-}
-
-function placeMarker(lat, lng) {
-  if (domMarker) {
-    domMarker.setLatLng([lat, lng]);
-  } else {
-    domMarker = L.marker([lat, lng]).addTo(domMap);
-  }
-  form.elements["dom_gps_lat"].value = lat.toFixed(6);
-  form.elements["dom_gps_lng"].value = lng.toFixed(6);
-  btnClearLocation.hidden = false;
-}
-
-function initDomMap() {
-  if (domMap) return;
-  domMap = L.map("dom-map").setView([DEFAULT_LOCATION.lat, DEFAULT_LOCATION.lng], 13);
-  // Se saca el prefijo "Leaflet" (no es obligatorio); la atribución a
-  // OpenStreetMap sí es requisito de su licencia y se mantiene.
-  domMap.attributionControl.setPrefix(false);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap contributors",
-    maxZoom: 19,
-  }).addTo(domMap);
-
-  const storeMarkers = STORE_LOCATIONS.map((store) => {
-    const mapsUrl = `https://www.google.com/maps?q=${store.lat},${store.lng}`;
-    return L.marker([store.lat, store.lng], { icon: storeIcon, keyboard: false })
-      .bindPopup(`<strong>${store.name}</strong><br><a href="${mapsUrl}" target="_blank" rel="noopener">Ver en Google Maps</a>`)
-      .addTo(domMap);
-  });
-
-  domMap.on("click", (e) => {
-    placeMarker(e.latlng.lat, e.latlng.lng);
-    setLocationStatus("Ubicación marcada manualmente.", "ok");
-  });
-
-  // El contenedor recién pasa de display:none a visible en este mismo
-  // instante (el paso anterior lo tenía oculto), así que Leaflet todavía
-  // no puede medirlo bien de forma sincrónica: se difiere al siguiente
-  // tick, si no el encuadre inicial sale con un zoom absurdo (todo el
-  // mundo, en vez de la zona de las sucursales).
-  setTimeout(() => {
-    domMap.invalidateSize();
-    // Si el formulario ya traía coordenadas cargadas (p. ej. al reabrir un
-    // borrador), se muestra el marcador correspondiente. Si no, se
-    // encuadra la vista para que se vean las sucursales de referencia.
-    const savedLat = parseFloat(form.elements["dom_gps_lat"].value);
-    const savedLng = parseFloat(form.elements["dom_gps_lng"].value);
-    if (!isNaN(savedLat) && !isNaN(savedLng)) {
-      domMap.setView([savedLat, savedLng], 16);
-      placeMarker(savedLat, savedLng);
-    } else {
-      domMap.fitBounds(L.featureGroup(storeMarkers).getBounds().pad(0.4));
-    }
-  }, 0);
-}
-
-btnClearLocation.addEventListener("click", () => {
-  if (domMarker) {
-    domMap.removeLayer(domMarker);
-    domMarker = null;
-  }
-  form.elements["dom_gps_lat"].value = "";
-  form.elements["dom_gps_lng"].value = "";
-  btnClearLocation.hidden = true;
-  setLocationStatus("", "");
-});
-
 // ---------- Bloqueo de emojis / símbolos no soportados ----------
 form.addEventListener("input", (e) => {
   const el = e.target;
@@ -165,10 +84,9 @@ form.addEventListener("input", (e) => {
 // ---------- Validación de campos obligatorios (marcados con "*") ----------
 const REQUIRED_FIELDS = [
   "tit_nombre", "tit_ci", "tit_monto_solicitado", "tit_nacionalidad", "tit_sexo",
-  "tit_fecha_nac", "tit_vivienda", "tit_estado_civil", "tit_celular",
+  "tit_fecha_nac", "tit_vivienda", "tit_celular",
   "dom_direccion", "dom_barrio", "dom_ciudad",
   "lab_empresa", "lab_tipo_empleo", "lab_cargo", "lab_monto_ingreso", "lab_antiguedad",
-  "ing_sueldo",
   "refper1_nombre", "refper1_celular", "refper1_vinculo",
   "refper2_nombre", "refper2_celular", "refper2_vinculo",
 ];
@@ -179,6 +97,7 @@ function getConditionalRequiredFields() {
   const extra = [];
   if (form.elements["tit_vivienda"].value === "Otra") extra.push("tit_vivienda_otra");
   if (form.elements["lab_tipo_empleo"].value === "Otro") extra.push("lab_tipo_empleo_otro");
+  if (financeEnabled()) extra.push("ing_sueldo");
   return extra;
 }
 
@@ -196,7 +115,7 @@ function goToFieldStep(name) {
   const el = form.querySelector(`[name="${name}"]`);
   if (!el) return;
   const panel = el.closest(".tab-panel");
-  const index = Array.from(panels).indexOf(panel);
+  const index = getPanels().indexOf(panel);
   if (index !== -1) showStep(index);
   el.focus();
 }
@@ -248,7 +167,7 @@ function formatMoney(n) {
   return n ? n.toLocaleString("es-PY") : "";
 }
 function recalcTotals() {
-  const ingIds = ["ing_sueldo", "ing_sueldo_conyuge", "ing_jubilacion", "ing_otros"];
+  const ingIds = ["ing_sueldo", "ing_otros"];
   const egrIds = ["egr_gastos_familiares", "egr_cuota_prestamos", "egr_alquiler", "egr_otros"];
   const sum = (ids) => ids.reduce((acc, id) => acc + parseMoney(form.elements[id].value), 0);
   form.elements["ing_total"].value = formatMoney(sum(ingIds));
@@ -340,7 +259,7 @@ btnSend.addEventListener("click", async () => {
   }
   if (!termsCheckbox.checked) {
     termsCheckbox.classList.add("field-error");
-    showStep(lastStepIndex);
+    showStep(getLastStepIndex());
     termsCheckbox.focus();
     lastMissingFieldName = "terms-accept";
     setSendMsg("Falta aceptar la declaración jurada y autorización para poder enviar.", "error");

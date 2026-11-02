@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Formulario Fidelity Card</title>
 <link rel="icon" href="assets/favicon.ico">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -28,12 +27,12 @@
 <nav class="tabs" id="tabs">
   <button class="tab-btn active" data-tab="titular">Datos del Titular</button>
   <button class="tab-btn" data-tab="domicilio">Domicilio y Laboral</button>
-  <button class="tab-btn" data-tab="finanzas">Ingresos / Egresos</button>
+  <button class="tab-btn" data-tab="finanzas" hidden>Ingresos / Egresos</button>
   <button class="tab-btn" data-tab="referencias">Referencias</button>
   <button class="tab-btn" data-tab="conyuge" hidden>Cónyuge / Adicional</button>
   <button class="tab-btn" data-tab="firmas" hidden>Registro de Firmas</button>
   <button class="tab-btn" data-tab="tarjeta" hidden>Datos de Tarjeta</button>
-  <button class="tab-btn" data-tab="seguro">Seguro Crediticio</button>
+  <button class="tab-btn" data-tab="seguro">Declaración Jurada</button>
 </nav>
 
 <form id="fidelity-form">
@@ -67,7 +66,7 @@
         <input type="date" name="tit_fecha_nac" required>
       </label>
 
-      <div class="col-6 field-radio">
+      <div class="col-12 field-radio">
         <span class="field-label">Vivienda<span class="required-mark">*</span></span>
         <div class="radio-row">
           <label><input type="radio" name="tit_vivienda" value="Propia" required> Propia</label>
@@ -75,15 +74,6 @@
           <label><input type="radio" name="tit_vivienda" value="Otra" required> Otra</label>
         </div>
         <input type="text" name="tit_vivienda_otra" placeholder="Especificar..." class="conditional-input" data-show-when="tit_vivienda=Otra" maxlength="30">
-      </div>
-      <div class="col-6 field-radio">
-        <span class="field-label">Estado Civil<span class="required-mark">*</span></span>
-        <div class="radio-row wrap">
-          <label><input type="radio" name="tit_estado_civil" value="Soltero" required> Soltero/a</label>
-          <label><input type="radio" name="tit_estado_civil" value="Casado" required> Casado/a</label>
-          <label><input type="radio" name="tit_estado_civil" value="Divorciado" required> Divorciado/a</label>
-          <label><input type="radio" name="tit_estado_civil" value="Viudo" required> Viudo/a</label>
-        </div>
       </div>
 
       <label class="col-6"><span>Número de Celular<span class="required-mark">*</span></span>
@@ -93,13 +83,7 @@
         <input type="email" name="tit_email">
       </label>
 
-      <label class="col-4">Sucursal
-        <input type="text" name="meta_sucursal">
-      </label>
-      <label class="col-4">Sección
-        <input type="text" name="meta_seccion">
-      </label>
-      <label class="col-4">Captador
+      <label class="col-12">Captador
         <input type="text" name="meta_captador" maxlength="20">
       </label>
     </div>
@@ -118,20 +102,7 @@
       <label class="col-3"><span>Ciudad<span class="required-mark">*</span></span>
         <input type="text" name="dom_ciudad" required>
       </label>
-      <label class="col-12">Obs.
-        <input type="text" name="dom_obs" maxlength="60">
-      </label>
     </div>
-
-    <h2>Ubicación</h2>
-    <p class="hint">Marcá en el mapa el punto donde queda tu domicilio.</p>
-    <div class="location-actions">
-      <button type="button" id="btn-clear-location" class="btn secondary" hidden>Borrar ubicación</button>
-      <span id="location-status" class="status-msg"></span>
-    </div>
-    <div id="dom-map" class="location-map"></div>
-    <input type="hidden" name="dom_gps_lat">
-    <input type="hidden" name="dom_gps_lng">
 
     <h2>Datos Laborales</h2>
     <div class="grid">
@@ -170,18 +141,12 @@
   </section>
 
   <!-- ============ INGRESOS / EGRESOS ============ -->
-  <section class="tab-panel" data-panel="finanzas">
+  <section class="tab-panel" data-panel="finanzas" hidden>
     <h2>Ingresos y Egresos (expresados en guaraníes)</h2>
     <div class="grid two-col-money">
       <div class="money-col">
         <label><span>Sueldo<span class="required-mark">*</span></span>
           <input type="text" name="ing_sueldo" class="money" inputmode="numeric" placeholder="Gs." required>
-        </label>
-        <label>Sueldo Cónyuge
-          <input type="text" name="ing_sueldo_conyuge" class="money" inputmode="numeric" placeholder="Gs.">
-        </label>
-        <label>Jubilación
-          <input type="text" name="ing_jubilacion" class="money" inputmode="numeric" placeholder="Gs.">
         </label>
         <label>Otros ingresos
           <input type="text" name="ing_otros" class="money" inputmode="numeric" placeholder="Gs.">
@@ -218,22 +183,6 @@
 
   <!-- ============ REFERENCIAS ============ -->
   <section class="tab-panel" data-panel="referencias">
-    <h2>Referencias Comerciales (Otros)</h2>
-    <div class="grid">
-      <label class="col-7">Entidad
-        <input type="text" name="refcom1_entidad" maxlength="40">
-      </label>
-      <label class="col-5">Teléfono
-        <input type="text" name="refcom1_telefono" inputmode="tel">
-      </label>
-      <label class="col-7">Entidad
-        <input type="text" name="refcom2_entidad" maxlength="40">
-      </label>
-      <label class="col-5">Teléfono
-        <input type="text" name="refcom2_telefono" inputmode="tel">
-      </label>
-    </div>
-
     <h2>Referencias Personales (Pariente o Amigo)</h2>
     <div class="grid">
       <label class="col-5"><span>Nombres y Apellidos<span class="required-mark">*</span></span>
@@ -369,44 +318,6 @@
 
   <!-- ============ SEGURO ============ -->
   <section class="tab-panel" data-panel="seguro">
-    <h2>Contrato de Seguro Crediticio — Cancelación de Deudas</h2>
-    <p class="hint">El cliente y la cédula de identidad al pie quedan en blanco para la firma manuscrita.</p>
-    <div class="grid">
-      <label class="col-4">Sucursal
-        <input type="text" name="seg_sucursal">
-      </label>
-      <label class="col-4">Póliza / Endorso N°
-        <input type="text" name="seg_poliza">
-      </label>
-      <label class="col-6">Asegurado
-        <input type="text" name="seg_asegurado">
-      </label>
-      <label class="col-6">Documento
-        <input type="text" name="seg_documento" inputmode="numeric">
-      </label>
-      <label class="col-7">Domicilio
-        <input type="text" name="seg_domicilio">
-      </label>
-      <label class="col-5">Localidad
-        <input type="text" name="seg_localidad">
-      </label>
-      <label class="col-4">Emisión
-        <input type="date" name="seg_emision">
-      </label>
-      <label class="col-4">Vigencia desde (12:00hs. del)
-        <input type="date" name="seg_vigencia_desde">
-      </label>
-      <label class="col-4">Vigencia hasta (12:00hs. del)
-        <input type="date" name="seg_vigencia_hasta">
-      </label>
-      <label class="col-4">Plazo
-        <input type="text" name="seg_plazo">
-      </label>
-      <label class="col-8">Capital Asegurado de la Presente Póliza
-        <input type="text" name="seg_capital" inputmode="numeric">
-      </label>
-    </div>
-
     <h2>Declaración Jurada y Autorización</h2>
     <div class="terms-box">
       <div class="terms-text">Declaramos bajo fe de juramento que la información y los datos presentados a FIDELITY GROUP S.A. en este formulario son correctos y absolutamente verdaderos y tanto ella como los demás documentos adjuntos corresponden al fiel reflejo de la realidad de nuestra situación patrimonial. Al mismo tiempo, nos comprometemos a informar por escrito a FIDELITY GROUP S.A. cualquier modificación aquí suministrada. Autorizamos irrevocablemente a FIDELITY GROUP S.A. otorgándole mandato suficiente en los términos del Art. 917 Inc. A del Código Civil para que por cuenta propia o de terceros proceda a verificar y proveer cualquier información que pueda afectar a la relación de confiabilidad y/o solvencia necesaria para la utilización de los servicios y realizar operaciones crediticias, a consultar a empresas, a recabar y proveer a cualquier persona información sobre nuestra situación patrimonial, solvencia económica, operaciones activas y pasivas, comportamiento de pago, cumplimiento o no de nuestras obligaciones. Asimismo, declaramos haber recibido el CONTRATO ÚNICO, el cual reconocemos haber leído íntegramente, habiendo comprometido sus términos, condiciones, obligaciones y derechos allí previstos, a los cuales nos adherimos expresamente mediante la firma de la presente solicitud. En este sentido, reconocemos haber sido informados por FIDELITY GROUP S.A. de las características esenciales de los productos bancarios contratados, específicamente sobre los derechos y obligaciones, los costos y gastos, la cancelación, el procedimiento de reclamos y los derechos consagrados en la Ley Nº 1334/98 de Defensa al Consumidor o Usuarios y sus reglamentaciones. Así también reconocemos al presente documento como suficiente instrumento jurídico, y como único fuero competente la circunscripción de Ciudad Del Este. Nos obligamos a leer íntegramente las eventuales modificaciones y actualizaciones del Contrato de Fidelity Group.</div>
@@ -429,7 +340,6 @@
   <p>Tus datos personales son tratados de forma confidencial y se utilizan exclusivamente para evaluar esta solicitud de tarjeta Fidelity Card, conforme a nuestra Política de Privacidad.</p>
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="config.js"></script>
 <script src="manifest.js"></script>
 <script src="app.js"></script>
