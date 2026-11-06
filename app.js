@@ -203,6 +203,25 @@ function todayDMY() {
   return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
 }
 
+// Versión del texto de la declaración jurada que se muestra al cliente.
+// Subir TERMS_VERSION cada vez que se cambie el texto; el hash (calculado
+// sobre el texto real de la pantalla) avisa si se olvidó de subirla.
+const TERMS_VERSION = "v1";
+function getTermsVersion() {
+  const text = document.querySelector(".terms-text").textContent.replace(/\s+/g, " ").trim();
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return `${TERMS_VERSION} (${h.toString(16).padStart(8, "0")})`;
+}
+
+function nowHM() {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+
 function collectFormData() {
   const data = new FormData(form);
   const get = (name) => (data.get(name) || "").toString().trim();
@@ -210,6 +229,11 @@ function collectFormData() {
   for (const name of ALL_FIELD_NAMES) {
     if (name === "tit_fecha_solicitud") {
       result[name] = todayDMY();
+    } else if (name === "terms_version") {
+      result[name] = termsCheckbox.checked ? getTermsVersion() : "";
+    } else if (name === "terms_aceptado") {
+      // Constancia de la aceptación (el envío exige tener el check tildado).
+      result[name] = termsCheckbox.checked ? `Sí - ${todayDMY()} ${nowHM()}` : "";
     } else {
       result[name] = DATE_INPUT_NAMES.includes(name) ? formatDateDMY(get(name)) : get(name);
     }

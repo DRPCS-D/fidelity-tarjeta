@@ -51,6 +51,7 @@ const FIELD_NAMES = [
   "seg_sucursal", "seg_poliza", "seg_asegurado", "seg_documento", "seg_domicilio", "seg_localidad",
   "seg_emision", "seg_vigencia_desde", "seg_vigencia_hasta", "seg_plazo", "seg_capital",
   "egr_otros_detalle", "ing_otros_detalle", "dom_gps_lat", "dom_gps_lng",
+  "terms_aceptado", "terms_version",
 ];
 
 // Columnas fijas al principio de la planilla.
@@ -73,7 +74,7 @@ const GPS_COLUMNS = ["dom_gps_lat", "dom_gps_lng"];
 
 // Columnas que hay que forzar a formato texto ANTES de escribir para que
 // Sheets no las reinterprete como fecha o número.
-const FORCE_TEXT_COLUMNS = DATE_COLUMNS.concat(GPS_COLUMNS);
+const FORCE_TEXT_COLUMNS = DATE_COLUMNS.concat(GPS_COLUMNS, ["terms_aceptado"]);
 
 function getSheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();

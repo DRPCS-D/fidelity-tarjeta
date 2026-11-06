@@ -53,6 +53,7 @@ const ALL_FIELD_NAMES = [
   "seg_emision", "seg_vigencia_desde", "seg_vigencia_hasta", "seg_plazo", "seg_capital",
   // Campos nuevos, agregados al final para no romper el orden de columnas ya existentes
   "egr_otros_detalle", "ing_otros_detalle", "dom_gps_lat", "dom_gps_lng",
+  "terms_aceptado", "terms_version",
 ];
 
 const FIELD_LABELS = {
@@ -143,6 +144,8 @@ const FIELD_LABELS = {
   ing_otros_detalle: "Otros ingresos (detalle)",
   dom_gps_lat: "Ubicación GPS - Latitud",
   dom_gps_lng: "Ubicación GPS - Longitud",
+  terms_aceptado: "Declaración jurada aceptada",
+  terms_version: "Versión del texto aceptado",
 };
 
 // Grupos usados para armar la vista de detalle del panel de gestión.
@@ -155,5 +158,6 @@ const FIELD_GROUPS = [
   { title: "Cónyuge / Adicional", fields: ["con_nombre","con_nacionalidad","con_ci","con_sexo","con_fecha_nac","conlab_empresa","conlab_celular","conlab_direccion","conlab_tipo_empleo","conlab_tipo_empleo_otro","conlab_cargo","conlab_monto_ingreso","conlab_antiguedad"] },
   { title: "Registro de Firmas", fields: ["firma_nombres","firma_apellidos"] },
   { title: "Datos de Tarjeta", fields: ["card_numero","card_linea_credito","card_costo_emision","card_costo_cuota_anual","card_costo_renovacion","card_interes_compensatorio","card_interes_moratorio","card_interes_punitorio","card_gestion_recupero"] },
+  { title: "Declaración Jurada", fields: ["terms_aceptado","terms_version"] },
   { title: "Seguro Crediticio", fields: ["seg_sucursal","seg_poliza","seg_asegurado","seg_documento","seg_domicilio","seg_localidad","seg_emision","seg_vigencia_desde","seg_vigencia_hasta","seg_plazo","seg_capital"] },
 ];
